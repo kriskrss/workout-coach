@@ -1,0 +1,373 @@
+[
+  {
+    "file": "episodes/mon-01.mp3",
+    "day": "mon",
+    "title": "Grokking the Fundamentals of System Design: Time, Ordering, and Consistency",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/62c267e1-c1e3-482d-b4e3-da5b619b2b8c/ep-90e253f1-035a-4fb2-90f9-f06e077ed148.mp3",
+    "duration_sec": 624
+  },
+  {
+    "file": "episodes/mon-02.mp3",
+    "day": "mon",
+    "title": "Distributed Systems for Practitioners: CAP, Consistency Models, and Isolation Levels",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/54eac111-27c1-4701-8109-09302a51f9ed/ep-109567dc-b3a4-4088-99d4-a5a41e73b9eb.mp3",
+    "duration_sec": 704
+  },
+  {
+    "file": "episodes/mon-03.mp3",
+    "day": "mon",
+    "title": "Grokking the System Design Interview: Consistency, CAP, and Quorums",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/651573bb-5a97-41c7-b70d-a78c41f356c2/ep-96aa53f9-2ba2-4b61-8923-1a1e3b9010ca.mp3",
+    "duration_sec": 445
+  },
+  {
+    "file": "episodes/mon-04.mp3",
+    "day": "mon",
+    "title": "Grokking the Fundamentals of System Design: Coordination and Consensus",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/62c267e1-c1e3-482d-b4e3-da5b619b2b8c/ep-1d9db893-7531-440f-9d10-321c3ed93e6c.mp3",
+    "duration_sec": 442
+  },
+  {
+    "file": "episodes/mon-05.mp3",
+    "day": "mon",
+    "title": "Distributed Systems for Practitioners: Partitioning, Replication, and Quorums",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/54eac111-27c1-4701-8109-09302a51f9ed/ep-fa5e75a5-fc35-4c8f-88c3-8b5343cffe22.mp3",
+    "duration_sec": 623
+  },
+  {
+    "file": "episodes/mon-06.mp3",
+    "day": "mon",
+    "title": "Distributed Systems for Practitioners: Consensus \u2014 Paxos and Raft",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/54eac111-27c1-4701-8109-09302a51f9ed/ep-dd1a7505-c4c5-404a-a2db-69325242e050.mp3",
+    "duration_sec": 829
+  },
+  {
+    "file": "episodes/tue-01.mp3",
+    "day": "tue",
+    "title": "Grokking the Fundamentals of System Design: Failures and Fault Tolerance",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/62c267e1-c1e3-482d-b4e3-da5b619b2b8c/ep-5c27fd03-881a-496a-b197-4f34376ff8d9.mp3",
+    "duration_sec": 911
+  },
+  {
+    "file": "episodes/tue-02.mp3",
+    "day": "tue",
+    "title": "Distributed Systems for Practitioners: Fallacies, Failures, and Correctness",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/54eac111-27c1-4701-8109-09302a51f9ed/ep-cd2f2faa-dfbe-4f7c-90f3-f5cbc92bc7c9.mp3",
+    "duration_sec": 669
+  },
+  {
+    "file": "episodes/tue-03.mp3",
+    "day": "tue",
+    "title": "Grokking the System Design Interview: Reliability: Leaders, Heartbeats, and Checksums",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/651573bb-5a97-41c7-b70d-a78c41f356c2/ep-55ac561b-15f4-4d94-817c-440770fab9cd.mp3",
+    "duration_sec": 489
+  },
+  {
+    "file": "episodes/tue-04.mp3",
+    "day": "tue",
+    "title": "Distributed Systems for Practitioners: Dealing with Failure and Distributed Tracing",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/54eac111-27c1-4701-8109-09302a51f9ed/ep-27f3a698-2231-4d6b-8494-b4f76084e1b5.mp3",
+    "duration_sec": 540
+  },
+  {
+    "file": "episodes/tue-05.mp3",
+    "day": "tue",
+    "title": "Distributed Systems: Building Software for the Real World: Stability Patterns \u2014 Timeouts, Circuit Breakers, and Bulkheads",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/f5f794d3-ed92-41a7-823f-dda346a14d05/ep-a9f529f6-3bc3-49d2-a3a7-9d88e761b143.mp3",
+    "duration_sec": 437
+  },
+  {
+    "file": "episodes/tue-06.mp3",
+    "day": "tue",
+    "title": "Advanced System Design Interview Prep: Crash Course: State Machine Replication: Fault Tolerance via Replicated Logs",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/5c4ee5e3-0d1e-4eb2-a5bc-52205075fb16/ep-87e64a24-ba07-4687-ae13-474784ee7923.mp3",
+    "duration_sec": 309
+  },
+  {
+    "file": "episodes/tue-07.mp3",
+    "day": "tue",
+    "title": "Distributed Systems: Building Software for the Real World: Chaos Engineering \u2014 The Simian Army",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/f5f794d3-ed92-41a7-823f-dda346a14d05/ep-c92f6338-0adc-47d9-8e93-5c7a6dc33b26.mp3",
+    "duration_sec": 334
+  },
+  {
+    "file": "episodes/wed-01.mp3",
+    "day": "wed",
+    "title": "Grokking the Fundamentals of System Design: Storage and Databases",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/62c267e1-c1e3-482d-b4e3-da5b619b2b8c/ep-2b751fb7-be82-437c-ba92-e3ab433111f4.mp3",
+    "duration_sec": 658
+  },
+  {
+    "file": "episodes/wed-02.mp3",
+    "day": "wed",
+    "title": "Grokking the Fundamentals of System Design: Indexing and Query Optimization",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/62c267e1-c1e3-482d-b4e3-da5b619b2b8c/ep-f11453b6-df46-44a4-9005-3e420b5590bb.mp3",
+    "duration_sec": 403
+  },
+  {
+    "file": "episodes/wed-03.mp3",
+    "day": "wed",
+    "title": "Grokking the System Design Interview: SQL vs NoSQL and Data Partitioning",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/651573bb-5a97-41c7-b70d-a78c41f356c2/ep-00ec1f5d-c9aa-4cd8-b362-7ec505b8a4d4.mp3",
+    "duration_sec": 417
+  },
+  {
+    "file": "episodes/wed-04.mp3",
+    "day": "wed",
+    "title": "Grokking the Fundamentals of System Design: Replication, Partitioning, and Consistent Hashing",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/62c267e1-c1e3-482d-b4e3-da5b619b2b8c/ep-92401f7c-c752-469e-8c31-397a655cdb1c.mp3",
+    "duration_sec": 611
+  },
+  {
+    "file": "episodes/wed-05.mp3",
+    "day": "wed",
+    "title": "Distributed Systems for Practitioners: Case Study \u2014 Distributed Data Stores",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/54eac111-27c1-4701-8109-09302a51f9ed/ep-0322cacd-78d2-4020-8eea-b446b11bf07c.mp3",
+    "duration_sec": 968
+  },
+  {
+    "file": "episodes/wed-06.mp3",
+    "day": "wed",
+    "title": "Advanced System Design Interview Prep: Crash Course: Amazon DynamoDB: Managed NoSQL and Adaptive Throughput",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/5c4ee5e3-0d1e-4eb2-a5bc-52205075fb16/ep-95e82e7d-e0e0-467c-9ce6-5d31dae5b1e9.mp3",
+    "duration_sec": 276
+  },
+  {
+    "file": "episodes/wed-07.mp3",
+    "day": "wed",
+    "title": "Advanced System Design Interview Prep: Crash Course: Google's Bigtable: The Sorted Map That Scaled Google",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/5c4ee5e3-0d1e-4eb2-a5bc-52205075fb16/ep-e840f3ce-1ac8-49ec-9b5c-f795cd0d7e14.mp3",
+    "duration_sec": 303
+  },
+  {
+    "file": "episodes/thu-01.mp3",
+    "day": "thu",
+    "title": "Grokking the Fundamentals of System Design: Communication in Distributed Systems",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/62c267e1-c1e3-482d-b4e3-da5b619b2b8c/ep-ad5235c4-577c-44f0-b9a6-644f356aec73.mp3",
+    "duration_sec": 1107
+  },
+  {
+    "file": "episodes/thu-02.mp3",
+    "day": "thu",
+    "title": "Distributed Systems for Practitioners: The Networking Stack",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/54eac111-27c1-4701-8109-09302a51f9ed/ep-18834cd7-d35f-4afb-9575-eabb60ec8644.mp3",
+    "duration_sec": 672
+  },
+  {
+    "file": "episodes/thu-03.mp3",
+    "day": "thu",
+    "title": "API Design Foundations: What an API Is",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/6592aa7d-ae8e-45e3-b868-35bfb306a1cd/ep-9264201f-fd8d-4d9b-881d-a80ed9822efd.mp3",
+    "duration_sec": 379
+  },
+  {
+    "file": "episodes/thu-04.mp3",
+    "day": "thu",
+    "title": "Networking and Communication: How APIs Talk",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/6592aa7d-ae8e-45e3-b868-35bfb306a1cd/ep-60c4f334-f824-41ff-b0c1-df25f87f17d1.mp3",
+    "duration_sec": 518
+  },
+  {
+    "file": "episodes/thu-05.mp3",
+    "day": "thu",
+    "title": "Core Concepts: Versioning to REDCAMEL",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/6592aa7d-ae8e-45e3-b868-35bfb306a1cd/ep-cf630056-1556-4ae2-80a5-47739e12d114.mp3",
+    "duration_sec": 494
+  },
+  {
+    "file": "episodes/thu-06.mp3",
+    "day": "thu",
+    "title": "Grokking the System Design Interview: API Rate Limiting",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/651573bb-5a97-41c7-b70d-a78c41f356c2/ep-0a58d59b-17f6-46de-b81a-d065a9223305.mp3",
+    "duration_sec": 313
+  },
+  {
+    "file": "episodes/fri-01.mp3",
+    "day": "fri",
+    "title": "Grokking the Fundamentals of System Design: The System Design Interview",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/62c267e1-c1e3-482d-b4e3-da5b619b2b8c/ep-bbdfa842-a78f-4fe2-879c-22fbe4436135.mp3",
+    "duration_sec": 911
+  },
+  {
+    "file": "episodes/fri-02.mp3",
+    "day": "fri",
+    "title": "Grokking the System Design Interview: The Seven-Step Interview Framework",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/651573bb-5a97-41c7-b70d-a78c41f356c2/ep-584bf168-e9de-4fca-8679-458c47c90dd4.mp3",
+    "duration_sec": 365
+  },
+  {
+    "file": "episodes/fri-03.mp3",
+    "day": "fri",
+    "title": "Grokking the System Design Interview: TinyURL and Pastebin",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/651573bb-5a97-41c7-b70d-a78c41f356c2/ep-cbde54da-8937-4753-b466-9cbf4021837f.mp3",
+    "duration_sec": 434
+  },
+  {
+    "file": "episodes/fri-04.mp3",
+    "day": "fri",
+    "title": "Grokking the System Design Interview: Social Feeds: Instagram, Twitter, Newsfeed",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/651573bb-5a97-41c7-b70d-a78c41f356c2/ep-e5b5edbe-e78c-4e4c-a5c8-743a53c42443.mp3",
+    "duration_sec": 403
+  },
+  {
+    "file": "episodes/fri-05.mp3",
+    "day": "fri",
+    "title": "Grokking the System Design Interview: Search: Typeahead and Twitter Search",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/651573bb-5a97-41c7-b70d-a78c41f356c2/ep-b225ac99-75b4-4c9b-a0ea-dd25f99a350f.mp3",
+    "duration_sec": 598
+  },
+  {
+    "file": "episodes/fri-06.mp3",
+    "day": "fri",
+    "title": "Grokking the System Design Interview: Media Pipelines: Dropbox, YouTube, and Web Crawling",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/651573bb-5a97-41c7-b70d-a78c41f356c2/ep-58a964fe-fefd-4b60-88ce-d4154509b211.mp3",
+    "duration_sec": 504
+  },
+  {
+    "file": "episodes/fri-07.mp3",
+    "day": "fri",
+    "title": "Grokking the System Design Interview: Real-Time Systems and Chat",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/651573bb-5a97-41c7-b70d-a78c41f356c2/ep-21850557-064e-48bd-964e-fda6403fca90.mp3",
+    "duration_sec": 402
+  },
+  {
+    "file": "episodes/sat-01.mp3",
+    "day": "sat",
+    "title": "Grokking the Low Level Design Interview Using OOD Principles: Introduction and the Five-Step Interview Approach",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/44ab1d9a-5056-4976-8b00-f03db82e8519/ep-feee7e32-e8bf-4282-84dd-df89451e0612.mp3",
+    "duration_sec": 439
+  },
+  {
+    "file": "episodes/sat-02.mp3",
+    "day": "sat",
+    "title": "Grokking the Low Level Design Interview Using OOD Principles: The Four Pillars of Object-Oriented Programming",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/44ab1d9a-5056-4976-8b00-f03db82e8519/ep-4785d8dc-f37a-44b4-94bd-631e8e6e069e.mp3",
+    "duration_sec": 356
+  },
+  {
+    "file": "episodes/sat-03.mp3",
+    "day": "sat",
+    "title": "Grokking the Low Level Design Interview Using OOD Principles: Object-Oriented Analysis and UML Diagrams",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/44ab1d9a-5056-4976-8b00-f03db82e8519/ep-11c055a3-6bbe-42cf-be02-fd5f565eb5b3.mp3",
+    "duration_sec": 349
+  },
+  {
+    "file": "episodes/sat-04.mp3",
+    "day": "sat",
+    "title": "Grokking the Low Level Design Interview Using OOD Principles: SOLID Design Principles",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/44ab1d9a-5056-4976-8b00-f03db82e8519/ep-7c91d274-a43a-4e24-aeca-ded2d8d2088b.mp3",
+    "duration_sec": 373
+  },
+  {
+    "file": "episodes/sat-05.mp3",
+    "day": "sat",
+    "title": "Grokking the Low Level Design Interview Using OOD Principles: Design Patterns",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/44ab1d9a-5056-4976-8b00-f03db82e8519/ep-1dc443b7-daaf-4ca7-824b-c67b1874549e.mp3",
+    "duration_sec": 385
+  },
+  {
+    "file": "episodes/sat-06.mp3",
+    "day": "sat",
+    "title": "Grokking the Low Level Design Interview Using OOD Principles: Designing a Parking Lot and an Elevator System",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/44ab1d9a-5056-4976-8b00-f03db82e8519/ep-f0a12809-b4f7-4a3a-96e9-b7aea0ab6e19.mp3",
+    "duration_sec": 495
+  },
+  {
+    "file": "episodes/sat-07.mp3",
+    "day": "sat",
+    "title": "Grokking the Low Level Design Interview Using OOD Principles: Designing a Library Management System and a Meeting Scheduler",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/44ab1d9a-5056-4976-8b00-f03db82e8519/ep-aaa0c661-9ff3-48ee-b27f-2c458746b5cd.mp3",
+    "duration_sec": 417
+  },
+  {
+    "file": "episodes/sat-08.mp3",
+    "day": "sat",
+    "title": "Grokking the Low Level Design Interview Using OOD Principles: Designing a Vending Machine, a Blackjack Game, and a Jigsaw Puzzle",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/44ab1d9a-5056-4976-8b00-f03db82e8519/ep-c06f040c-c801-418f-90c3-a6127edf7ba0.mp3",
+    "duration_sec": 427
+  },
+  {
+    "file": "episodes/sat-09.mp3",
+    "day": "sat",
+    "title": "Grokking the Low Level Design Interview Using OOD Principles: Designing Stack Overflow and ESPNcricinfo",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/44ab1d9a-5056-4976-8b00-f03db82e8519/ep-af7d63b6-0b1f-4680-bc3b-281829219f4c.mp3",
+    "duration_sec": 271
+  },
+  {
+    "file": "episodes/sun-01.mp3",
+    "day": "sun",
+    "title": "Grokking the Behavioral Interview: Why Prepare for the Behavioral Interview",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/abf6277d-9043-4083-afaa-76a7a773aa1d/ep-bf6e0bfb-4702-4fcd-967f-087cb36e3de0.mp3",
+    "duration_sec": 364
+  },
+  {
+    "file": "episodes/sun-02.mp3",
+    "day": "sun",
+    "title": "Grokking the Behavioral Interview: Doing Your Homework and Finding Your Stories",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/abf6277d-9043-4083-afaa-76a7a773aa1d/ep-e902d14a-8c23-47fd-97bc-883ed33483fb.mp3",
+    "duration_sec": 273
+  },
+  {
+    "file": "episodes/sun-03.mp3",
+    "day": "sun",
+    "title": "Grokking the Behavioral Interview: The STAR Technique",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/abf6277d-9043-4083-afaa-76a7a773aa1d/ep-63feae15-fe71-492f-8554-602f7f0d2a18.mp3",
+    "duration_sec": 423
+  },
+  {
+    "file": "episodes/sun-04.mp3",
+    "day": "sun",
+    "title": "Grokking the Behavioral Interview: Recognizing Behavioral Questions and the I-Not-We Rule",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/abf6277d-9043-4083-afaa-76a7a773aa1d/ep-227252f4-2660-41e2-ae7a-7ab6967f63af.mp3",
+    "duration_sec": 303
+  },
+  {
+    "file": "episodes/sun-05.mp3",
+    "day": "sun",
+    "title": "Grokking the Behavioral Interview: Hypotheticals and Values-Based Questions",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/abf6277d-9043-4083-afaa-76a7a773aa1d/ep-b5d3933c-913a-417b-b6f9-5f7af5ce4c3d.mp3",
+    "duration_sec": 269
+  },
+  {
+    "file": "episodes/sun-06.mp3",
+    "day": "sun",
+    "title": "Grokking the Behavioral Interview: Introductions, Culture Fit, and the Airport Test",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/abf6277d-9043-4083-afaa-76a7a773aa1d/ep-15d2a6ca-1c54-4625-912e-4ee2cb549d48.mp3",
+    "duration_sec": 297
+  },
+  {
+    "file": "episodes/sun-07.mp3",
+    "day": "sun",
+    "title": "Grokking the Behavioral Interview: Asking Great Questions",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/abf6277d-9043-4083-afaa-76a7a773aa1d/ep-a94c82a3-34ef-4bf3-a211-8e66f49e515f.mp3",
+    "duration_sec": 371
+  },
+  {
+    "file": "episodes/sun-08.mp3",
+    "day": "sun",
+    "title": "Grokking the Behavioral Interview: Phone Interviews Done Right",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/abf6277d-9043-4083-afaa-76a7a773aa1d/ep-69af68c1-a1cf-4493-b2c8-177c91292057.mp3",
+    "duration_sec": 248
+  },
+  {
+    "file": "episodes/sun-09.mp3",
+    "day": "sun",
+    "title": "Grokking the Behavioral Interview: Body Language, What Your Body Says",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/abf6277d-9043-4083-afaa-76a7a773aa1d/ep-437c1bfa-0022-4c83-b000-cf817a05708b.mp3",
+    "duration_sec": 273
+  },
+  {
+    "file": "episodes/sun-10.mp3",
+    "day": "sun",
+    "title": "Grokking the Behavioral Interview: Video Conference Interviews",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/abf6277d-9043-4083-afaa-76a7a773aa1d/ep-60beb818-8e83-4b81-9ed0-43cc7b5d933b.mp3",
+    "duration_sec": 256
+  },
+  {
+    "file": "episodes/sun-11.mp3",
+    "day": "sun",
+    "title": "Grokking the Behavioral Interview: Handling Rejection and Practicing Like You Mean It",
+    "source_url": "https://muse.ai/podcasts/media/411693988696866/abf6277d-9043-4083-afaa-76a7a773aa1d/ep-fa7f7f91-c947-49f4-9a53-631e29de2ed2.mp3",
+    "duration_sec": 330
+  }
+]
