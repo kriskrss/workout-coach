@@ -2788,17 +2788,22 @@
          the day view shows, over the rolling window's tracked dates only —
          denominators count only the days that exist in the window. Each
          date contributes its own three tracks: the strength session it
-         renders (if any), its own scheduled cardio minutes, and the
-         lesson at the front of its queue. */
+         renders (if any), and its own scheduled cardio minutes. Lessons
+         are counted once per concept (see below), not once per date. */
       var asg = assignments();
-      var s = 0, w = 0, l = 0, dd = 0, sDen = 0, wDen = 0, lDen = 0;
+      var s = 0, w = 0, l = 0, dd = 0, sDen = 0, wDen = 0, lDen = 0, seenL = {};
       asg.forEach(function (a) {
         if (!a.cDay) return;
         if (a.sDay) { sDen++; if (strengthDone(a.sDay)) s++; }
         wDen += a.cDay.walkMin;
         if (cardioDone(a.cDay)) w += a.cDay.walkMin;
-        lDen++;
-        if (lessonDone(a.lDay)) l++;
+        /* Lessons count each concept ONCE, keyed to the plan day that owns
+           it — the concept scheduled for a window date (a.nominal), the
+           same plan-day keying phase % uses for portions. A carried-over
+           concept completed on a later date counts once, for its own
+           scheduled slot, never once per date it was rendered on. */
+        var owner = a.nominal || a.lDay;
+        if (owner && !seenL[owner.id]) { seenL[owner.id] = 1; lDen++; if (lessonDone(owner)) l++; }
         if (viewComplete(a)) dd++;
       });
       $("progDays").textContent = dd;
