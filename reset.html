@@ -1,0 +1,47 @@
+<!doctype html>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reset progress</title>
+<style>
+  body { font-family: system-ui, sans-serif; background: #10151f; color: #e8ecf3; margin: 0; padding: 24px 18px 48px; }
+  main { max-width: 520px; margin: 0 auto; }
+  h1 { font-size: 20px; margin: 0 0 6px; }
+  p { color: #9fb0c7; font-size: 14px; line-height: 1.5; }
+  a.btn, button.btn { display: block; width: 100%; box-sizing: border-box; text-align: left; background: #1b2334; color: #e8ecf3; border: 1px solid #2c3a55; border-radius: 10px; padding: 13px 15px; margin: 10px 0; font-size: 15px; text-decoration: none; cursor: pointer; }
+  a.btn small, button.btn small { display: block; color: #9fb0c7; font-size: 12.5px; margin-top: 3px; }
+  .danger { border-color: #6e3535; }
+  input[type="date"] { width: 100%; box-sizing: border-box; background: #1b2334; color: #e8ecf3; border: 1px solid #2c3a55; border-radius: 10px; padding: 11px 13px; font-size: 15px; margin: 6px 0 2px; }
+  h2 { font-size: 15px; margin: 26px 0 4px; }
+</style>
+<main>
+  <h1>Reset progress</h1>
+  <p>Progress is stored in the browser on this device. Each button opens the app with a reset instruction; the app applies it, saves, and shows a confirmation. Nothing here runs until a button is tapped.</p>
+
+  <a class="btn" href="./?reset=today">Reset today<small>Clear every tick for today's plan</small></a>
+  <a class="btn" href="./?reset=today-lesson">Reset today's lesson<small>Clear today's episode ticks and Lesson done only</small></a>
+  <a class="btn" href="./?reset=week">Reset this window<small>Clear all ticks in the current 7-day window</small></a>
+
+  <h2>Reset one day</h2>
+  <input type="date" id="day" value="2026-10-18" min="2026-10-18">
+  <button class="btn" id="day-all">Reset that day<small>All parts: strength, cardio, lesson</small></button>
+  <button class="btn" id="day-lesson">Reset that day's lesson<small>Episode ticks and Lesson done only</small></button>
+  <button class="btn" id="day-strength">Reset that day's strength<small>Strength block ticks only</small></button>
+  <button class="btn" id="day-cardio">Reset that day's cardio<small>Cardio phase ticks only</small></button>
+
+  <h2>Everything</h2>
+  <a class="btn danger" href="./?reset=all">Reset all progress<small>Clears all ticks and phase progress. Playback speed and coach settings are kept.</small></a>
+
+  <p>The same resets are available inside the app, in the collapsed "Reset progress" panel.</p>
+</main>
+<script>
+  var day = document.getElementById('day');
+  function go(part) {
+    var v = day.value;
+    if (!v) return;
+    location.href = './?reset=day:' + v + (part ? ':' + part : '');
+  }
+  document.getElementById('day-all').onclick = function () { go(''); };
+  document.getElementById('day-lesson').onclick = function () { go('lesson'); };
+  document.getElementById('day-strength').onclick = function () { go('strength'); };
+  document.getElementById('day-cardio').onclick = function () { go('cardio'); };
+</script>

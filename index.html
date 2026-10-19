@@ -75,7 +75,7 @@
       .hero p.lede { margin: 0; max-width: 62ch; color: var(--muted); font-size: 17px; }
       .hero p.lede strong { color: var(--ink); }
       .progress-grid {
-        display: grid; grid-template-columns: 1fr 1fr 1fr auto; gap: 14px;
+        display: grid; grid-template-columns: 1fr 1fr 1fr 1fr auto; gap: 14px;
         margin: 22px 0 6px;
       }
       .pstat {
@@ -433,6 +433,42 @@
       .ov-day .od-c { color: var(--muted); }
       .ov-day .od-open { margin-left: auto; color: var(--accent); font-weight: 700; font-size: 12.5px; white-space: nowrap; }
       @media (max-width: 680px) { .ov-day { flex-wrap: wrap; } .ov-day .od-open { margin-left: 44px; } }
+      /* ---------- collapsed chunks / queue summary / toast / resets ---------- */
+      .chunk-body { display: flex; flex-direction: column; gap: 10px; flex: 1; }
+      .chunk.is-collapsed .chunk-body { display: none; }
+      .chunk-expand {
+        font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; text-align: left;
+        background: var(--walk-soft); color: var(--walk); border: 1px solid var(--walk);
+        border-radius: 8px; padding: 9px 12px;
+      }
+      .q-strip { display: flex; flex-wrap: wrap; gap: 10px; align-items: stretch; padding: 12px 18px; }
+      .q-next {
+        flex: 1 1 240px; font: inherit; font-size: 14.5px; font-weight: 600; text-align: left; cursor: pointer;
+        background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); border-radius: 10px; padding: 9px 14px;
+      }
+      .q-next .qn-k { display: block; font-size: 11px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--accent); margin-bottom: 2px; }
+      span.q-next { cursor: default; }
+      span.q-next .qn-k { color: var(--walk); }
+      .q-show {
+        font: inherit; font-size: 13.5px; font-weight: 700; cursor: pointer; align-self: center;
+        background: transparent; color: var(--accent); border: 1px solid var(--line); border-radius: 99px; padding: 8px 15px;
+      }
+      .toast {
+        position: fixed; left: 50%; transform: translateX(-50%); bottom: 132px; z-index: 60;
+        background: var(--ink); color: var(--bg); font-size: 14.5px; font-weight: 600;
+        padding: 11px 20px; border-radius: 99px; box-shadow: 0 10px 30px rgba(0,0,0,.25);
+        max-width: min(92vw, 600px); text-align: center;
+      }
+      .toast[hidden] { display: none; }
+      .reset-grid { display: flex; flex-wrap: wrap; gap: 8px; margin: 4px 0 12px; }
+      .reset-btn {
+        font: inherit; font-size: 14px; font-weight: 700; cursor: pointer;
+        background: var(--panel-2); color: var(--ink); border: 1px solid var(--line);
+        border-radius: 99px; padding: 9px 16px;
+      }
+      .reset-btn.armed { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .reset-note { margin: 0 0 10px; font-size: 14px; color: var(--muted); }
+      .reset-note code { font-size: 12.5px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; white-space: nowrap; }
       @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
     </style>
   </head>
@@ -441,25 +477,30 @@
       <header class="hero">
         <h1>Move 60 minutes.<br /><span class="thin">Learn one concept a day.</span></h1>
         <p class="lede">Every day pairs a <strong>20-minute strength session</strong> (5 days a week) with a <strong>walk — 40 minutes on strength days, a full hour on rest days</strong>. The two chunks can happen at different times. During each session, an audio coach cues the sets and plays the day's <strong>podcast queue</strong> — one lesson topic per day. Weekly total: <strong>100 min strength + 320 min walking</strong>.</p>
-        <div class="cal-head"><h2>This week</h2><span id="calRange"></span></div>
+        <div class="cal-head"><h2>7-day window</h2><span id="calRange"></span></div>
         <div class="cal" id="calStrip" role="group" aria-label="Week calendar — tap a day to open it"></div>
         <p class="shift-note" id="shiftNote" hidden></p>
         <div class="phasebar" id="phaseBar"></div>
         <div class="phase-banner" id="phaseBanner" hidden></div>
         <div class="progress-grid">
           <div class="pstat">
-            <div class="k">Strength this week</div>
-            <div class="v"><span id="progStrength">0</span><small> / 5 sessions</small></div>
+            <div class="k">Days done</div>
+            <div class="v"><span id="progDays">0</span><small id="progDaysDen"> / 7 days</small></div>
+            <div class="bar"><i class="s" id="barDays"></i></div>
+          </div>
+          <div class="pstat">
+            <div class="k">Strength</div>
+            <div class="v"><span id="progStrength">0</span><small id="progStrengthDen"> / 5 sessions</small></div>
             <div class="bar"><i class="s" id="barStrength"></i></div>
           </div>
           <div class="pstat">
-            <div class="k">Walking this week</div>
-            <div class="v"><span id="progWalk">0</span><small> / 320 min</small></div>
+            <div class="k">Walking</div>
+            <div class="v"><span id="progWalk">0</span><small id="progWalkDen"> / 320 min</small></div>
             <div class="bar"><i class="w" id="barWalk"></i></div>
           </div>
           <div class="pstat">
-            <div class="k">Lessons this week</div>
-            <div class="v"><span id="progLesson">0</span><small> / 7 concepts</small></div>
+            <div class="k">Lessons</div>
+            <div class="v"><span id="progLesson">0</span><small id="progLessonDen"> / 7 concepts</small></div>
             <div class="bar"><i class="l" id="barLesson"></i></div>
           </div>
           <div class="pstat voice">
@@ -505,11 +546,27 @@
         <p><strong>Progression &amp; safety:</strong> start with the light pair everywhere for the first week, even if a heavier set is available. Progress duration first, then weight — one change at a time. One load source at a time: count the weights as part of the load. Take them off for joint pain (wrist, elbow, shoulder, knee, ankle), tingling or numbness. Fit: sit the weight just above the wrist or ankle bone — snug enough not to slide, loose enough that circulation is never restricted.</p>
       </section></details>
 
+      <details class="ref">
+        <summary>Reset progress</summary>
+        <div class="ref-body">
+          <p class="reset-note">Progress is stored only on this device, so resets run here in the app. Each button clears ticks stored on this device and asks for a confirming second tap before anything is cleared. Playback speed and the coach setting are always kept.</p>
+          <div class="reset-grid">
+            <button class="reset-btn" data-resetact="today" data-label="Reset today">Reset today</button>
+            <button class="reset-btn" data-resetact="today-lesson" data-label="Reset today's lesson">Reset today's lesson</button>
+            <button class="reset-btn" data-resetact="week" data-label="Reset this 7-day window">Reset this 7-day window</button>
+            <button class="reset-btn" data-resetact="all" data-label="Reset everything">Reset everything</button>
+          </div>
+          <p class="reset-note">The same resets can be triggered by adding a reset option to the page address: <code>?reset=today</code>, <code>?reset=today-lesson</code>, <code>?reset=day:2026-10-18</code> (append <code>:lesson</code>, <code>:strength</code> or <code>:cardio</code> to clear one part of that day), <code>?reset=week</code>, or <code>?reset=all</code>. The option is applied once, on load, then removed from the address.</p>
+        </div>
+      </details>
+
       <h2 class="sec-title">The program <span>Beginner · Intermediate · Advanced</span></h2>
       <p style="margin:0 0 14px;color:var(--muted);font-size:15px;max-width:78ch;">Three phases, four week-templates each. A phase takes <strong style="color:var(--ink)">at least two weeks</strong> and only unlocks the next when <strong style="color:var(--ink)">every portion</strong> — every strength block, cardio phase and lesson — is ticked complete. Anything unfinished rolls forward and simply extends the phase. Tap any day to preview it; locked phases are read-only.</p>
       <div id="overview"></div>
       <p class="foot">Every day of all twelve weeks — Beginner, Intermediate and Advanced — carries its full episode queue. Progress, done ticks, and playback position are saved on this device, so the strength and walk chunks can be split across the day and the audio picked up where it left off.</p>
     </div>
+
+    <div class="toast" id="toast" role="status" hidden></div>
 
     <div class="playerbar" id="playerbar">
       <div class="wrap">
@@ -1970,11 +2027,22 @@
     function dateISO(d) {
       return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
     }
-    /* phase state: which phase is live, when it started, maintenance rounds */
+    /* phase state: which phase is live, when it started, maintenance rounds.
+       The tracker itself starts 2026-10-18 — program day one. No date before
+       it exists in the tracker, and phase 0 is anchored to it. */
+    var START_ISO = "2026-10-18";
+    var START_DATE = new Date(2026, 9, 18);
     if (typeof store.phase !== "number" || store.phase < 0 || store.phase > 2) store.phase = 0;
-    if (!store.phaseStart) store.phaseStart = dateISO(weekMonday());   // a phase already under way counts from its Monday
+    if (!store.phaseStart) store.phaseStart = START_ISO;
     if (typeof store.maintRounds !== "number") store.maintRounds = 0;
     if (!store.calAssign) store.calAssign = {};
+    if (!store.phaseStarts || typeof store.phaseStarts !== "object") store.phaseStarts = {};
+    if (store.phase === 0) store.phaseStart = START_ISO;   // phase 0 begins on the tracker start date
+    store.phaseStarts[0] = START_ISO;
+    if (store.phase > 0) {
+      if (store.phaseStarts[store.phase]) store.phaseStart = store.phaseStarts[store.phase];
+      else store.phaseStarts[store.phase] = store.phaseStart;
+    }
     /* migrate ticks saved by the single-week version: old keys were bare
        weekday ids (mon..sun) — that week is exactly Beginner Week 1 now */
     ["mon", "tue", "wed", "thu", "fri", "sat", "sun"].forEach(function (bid) {
@@ -2031,46 +2099,109 @@
        order — nothing is skipped or lost. */
     function lessonDone(day) {
       var st = store.days[day.id];
-      // weeks 2–12 have no episode queue yet: the lesson is a manual tick
       return day.episodes.length ? st.ep >= day.episodes.length : !!st.lDone;
     }
+    /* Done state is always DERIVED from the per-portion ticks — never read
+       from a stored "done" flag — so the header counters, the calendar dots,
+       the day pills and the phase gate all read the same ticks the day view
+       shows, and unticking any single portion updates every one of them. */
+    function strengthDone(day) { return day.rest ? true : blocksAll(day, "s"); }
+    function cardioDone(day) { return blocksAll(day, "w"); }
     function dayComplete(day) {
-      var st = store.days[day.id];
-      return (day.rest || st.sDone) && st.wDone && lessonDone(day);
+      return strengthDone(day) && cardioDone(day) && lessonDone(day);
     }
-    /* Assignments map this calendar week's 7 slots to plan days (indices
-       into PLAN) inside the current phase. Today inherits the earliest
-       unfinished plan day of the phase; past days keep the plan they were
-       scheduled with (persisted in store.calAssign); later days flow on. */
-    function computeAssignments() {
-      var ti = todayIdx(), base = store.phase * 28, assign = [], i;
-      var todayPlan = base + 27;
-      for (i = 0; i < 28; i++) { if (!dayComplete(PLAN[base + i])) { todayPlan = base + i; break; } }
-      for (i = 0; i < 7; i++) {
-        var key = store.phase + ":" + dateISO(dayDate(i));
-        if (i < ti) {
-          var stored = store.calAssign[key];
-          if (typeof stored === "number") assign.push(stored);
-          else {
-            // never recorded (the app wasn't opened that day): reconstruct the
-            // nominal schedule from the phase start date — one plan day per
-            // calendar day, in order (days the app was opened have their true
-            // roll-forward schedule recorded above instead)
-            var pStart = String(store.phaseStart).split("-");
-            var startD = new Date(+pStart[0], (+pStart[1] || 1) - 1, +pStart[2] || 1);
-            var rel = Math.floor((dayDate(i) - startD) / 86400000);
-            assign.push(base + Math.max(0, Math.min(rel, 27)));
-          }
-        } else if (i === ti) {
-          assign.push(todayPlan);
-        } else {
-          assign.push(Math.min(todayPlan + (i - ti), base + 27));
-        }
-        if (i <= ti && store.calAssign[key] !== assign[i]) { store.calAssign[key] = assign[i]; save(); }
+    /* =============== ROLLING 7-DAY WINDOW ===============
+       The tracker frames a rolling window of 7 consecutive dates — 3 days
+       before today, today, 3 days after — with a hard floor at the tracker
+       start (2026-10-18): the first window runs Oct 18–24, and the window
+       starts sliding once today − 3 passes Oct 18. Dates before the start
+       do not exist in the tracker at all: no cards, no catch-up debt, and
+       their portions never count toward phase completion.
+       Every tracked date maps to a plan day. Plan days follow the phase
+       day by day from the phase start (phase 0 starts 2026-10-18): the
+       week template advances every 7 days and the session follows the
+       date's own weekday. Past dates keep the plan they ran (persisted in
+       store.calAssign, keyed by date); today inherits the earliest
+       unfinished tracked plan day of the phase (catch-up); later dates
+       flow on from there in order — nothing is skipped or lost. */
+    function addDays(d, n) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; }
+    function todayDate() { var d = new Date(); d.setHours(0, 0, 0, 0); return d; }
+    function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
+    function sameDay(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
+    function mon0(d) { var js = d.getDay(); return js === 0 ? 6 : js - 1; }   // Mon=0..Sun=6
+    function parseISO(s) { var p = String(s || "").split("-"); return new Date(+p[0], (+p[1] || 1) - 1, +p[2] || 1); }
+    function phaseStartISO(p) {
+      if (p === 0) return START_ISO;
+      if (store.phaseStarts && store.phaseStarts[p]) return store.phaseStarts[p];
+      if (p === store.phase) return store.phaseStart || START_ISO;
+      return START_ISO;
+    }
+    function phaseStartDate(p) { return parseISO(phaseStartISO(p)); }
+    function phaseForDate(D) {
+      for (var p = store.phase; p >= 0; p--) { if (D >= phaseStartDate(p)) return p; }
+      return -1;
+    }
+    function planDayForOffset(p, k) {
+      var date = addDays(phaseStartDate(p), k);
+      var slot = ((k % 28) + 28) % 28;
+      return PLAN[p * 28 + Math.floor(slot / 7) * 7 + mon0(date)];
+    }
+    function nominalPlanDay(D) {
+      var p = phaseForDate(D);
+      if (p < 0) return null;
+      return planDayForOffset(p, daysBetween(phaseStartDate(p), D));
+    }
+    function nominalDateForPlanDay(day) {
+      var start = phaseStartDate(day.phase);
+      for (var k = 0; k < 28; k++) { if (planDayForOffset(day.phase, k).id === day.id) return addDays(start, k); }
+      return start;
+    }
+    function todayEffective() {
+      var today = todayDate(), p = store.phase;
+      var kToday = daysBetween(phaseStartDate(p), today);
+      for (var k = 0; k <= Math.min(kToday, 27); k++) {
+        var d = planDayForOffset(p, k);
+        if (!dayComplete(d)) return { day: d, k: k };
       }
-      return assign;
+      return { day: nominalPlanDay(today), k: kToday };
     }
-    function slotFor(calIdx) { return PLAN[computeAssignments()[calIdx]]; }
+    function effectivePlanDayForDate(D) {
+      var today = todayDate();
+      if (sameDay(D, today)) return todayEffective().day;
+      if (D < today) {
+        var sid = store.calAssign[dateISO(D)];
+        var sd = sid ? dayById(sid) : null;
+        return sd || nominalPlanDay(D);
+      }
+      return nominalPlanDay(D);
+    }
+    function windowStartDate() {
+      var s = addDays(todayDate(), -3);
+      return s < START_DATE ? new Date(START_DATE.getTime()) : s;
+    }
+    function todayWinIdx() { return daysBetween(windowStartDate(), todayDate()); }
+    function assignments() {
+      var start = windowStartDate(), today = todayDate(), te = null, out = [];
+      for (var j = 0; j < 7; j++) {
+        var D = addDays(start, j), iso = dateISO(D), nom = nominalPlanDay(D), day = null;
+        if (D < today) {
+          var sid = store.calAssign[iso];
+          day = sid ? dayById(sid) : null;
+          if (!day) day = nom;
+        } else if (sameDay(D, today)) {
+          if (!te) te = todayEffective();
+          day = te.day;
+        } else {
+          if (!te) te = todayEffective();
+          day = planDayForOffset(store.phase, te.k + daysBetween(today, D));
+        }
+        if (!day) day = nom;
+        if (day && D <= today && store.calAssign[iso] !== day.id) { store.calAssign[iso] = day.id; save(); }
+        out.push({ date: D, iso: iso, day: day, nominal: nom });
+      }
+      return out;
+    }
+    function todayPlanDay() { return assignments()[todayWinIdx()].day; }
 
     /* =============== PHASE GATING ===============
        A phase unlocks the next only when 100% of its portions are ticked
@@ -2093,8 +2224,7 @@
       return { done: done, total: total };
     }
     function phaseElapsedDays() {
-      var parts = String(store.phaseStart).split("-");
-      var start = new Date(+parts[0], (+parts[1] || 1) - 1, +parts[2] || 1);
+      var start = phaseStartDate(store.phase);
       var now = new Date(); now.setHours(0, 0, 0, 0);
       return Math.max(0, Math.floor((now - start) / 86400000));
     }
@@ -2138,6 +2268,126 @@
       save();
     }
 
+    /* =============== RESETS ===============
+       State lives only in this browser's local storage, so resets run here
+       in the app: from the Reset panel, or from a ?reset= link handled once
+       on load (before the first render). Supported values:
+         reset=today                          — clear all of today's ticks
+         reset=today-lesson                   — clear only today's lesson
+         reset=day:YYYY-MM-DD                 — clear that date's ticks
+         reset=day:YYYY-MM-DD:lesson          — one part of that date
+         reset=day:YYYY-MM-DD:strength           (also :cardio)
+         reset=week                           — clear the current 7-day window
+         reset=all                            — clear ALL progress (ticks,
+           phase progress, catch-up); settings (speed, coach) are kept. */
+    var pendingToast = null;
+    function clearLessonTicks(day) { var st = store.days[day.id]; st.ep = 0; st.pos = 0; st.lDone = false; }
+    function clearStrengthTicks(day) { var st = store.days[day.id]; st.sBlocks = []; st.sDone = false; }
+    function clearCardioTicks(day) { var st = store.days[day.id]; st.wBlocks = []; st.wDone = false; }
+    function clearDayTicks(day) { if (!day.rest) clearStrengthTicks(day); clearCardioTicks(day); clearLessonTicks(day); }
+    function fmtDateShort(D) { return MONTH_S[D.getMonth()] + " " + D.getDate(); }
+    function applyReset(spec) {
+      if (!spec) return "That reset option wasn't recognised — nothing was changed.";
+      var msg;
+      if (spec.kind === "all") {
+        PLAN.forEach(function (d) { delete store.days[d.id]; });
+        store.phase = 0;
+        store.phaseStart = START_ISO;
+        store.phaseStarts = { "0": START_ISO };
+        store.maintRounds = 0;
+        store.calAssign = {};
+        initDayDefaults();
+        sessions = {};
+        try { audio.pause(); audio.removeAttribute("src"); audio.load(); } catch (e) {}
+        cur.dayId = null; cur.ep = -1;
+        embedFailedKey = null; hideOpenFallback();
+        previewSel = null; focusIdx = todayWinIdx(); ovSig = null;
+        expandedChunks = {}; expandedQueues = {};
+        msg = "All progress reset — every tick, phase progress and catch-up state cleared. Playback speed and coach setting kept.";
+      } else if (spec.kind === "week") {
+        var seen = {};
+        assignments().forEach(function (a) { if (a.day && !seen[a.day.id]) { seen[a.day.id] = 1; clearDayTicks(a.day); } });
+        msg = "7-day window reset — ticks cleared for every day in the current window.";
+      } else if (spec.kind === "today" || spec.kind === "today-lesson") {
+        var td = todayPlanDay();
+        if (!td) return "No tracked plan for today — nothing was changed.";
+        if (spec.kind === "today") { clearDayTicks(td); msg = "Today reset — all ticks cleared for today's plan (" + td.day + ")."; }
+        else { clearLessonTicks(td); msg = "Today's lesson reset — episode ticks cleared; strength and cardio ticks kept."; }
+      } else if (spec.kind === "day") {
+        var D = spec.date;
+        if (D < START_DATE) return fmtDateShort(D) + " is before the tracker start (Oct 18, 2026) — nothing to reset.";
+        var day = effectivePlanDayForDate(D);
+        if (!day) return "No tracked plan for " + fmtDateShort(D) + " — nothing was changed.";
+        var label = fmtDateShort(D) + " (" + DAYS[mon0(D)].day + ")";
+        if (spec.part === "lesson") { clearLessonTicks(day); msg = label + " — lesson reset: episode ticks cleared; workout and cardio ticks kept."; }
+        else if (spec.part === "strength") {
+          if (day.rest) return label + " runs a rest-day plan — no strength ticks to clear.";
+          clearStrengthTicks(day); msg = label + " — strength ticks cleared.";
+        }
+        else if (spec.part === "cardio") { clearCardioTicks(day); msg = label + " — cardio ticks cleared."; }
+        else { clearDayTicks(day); msg = label + " — all ticks cleared for that day's plan."; }
+      } else {
+        return "That reset option wasn't recognised — nothing was changed.";
+      }
+      save();
+      return msg;
+    }
+    function parseResetSpec(raw) {
+      if (raw === "today") return { kind: "today" };
+      if (raw === "today-lesson") return { kind: "today-lesson" };
+      if (raw === "week") return { kind: "week" };
+      if (raw === "all") return { kind: "all" };
+      var m = /^day:(\d{4})-(\d{2})-(\d{2})(?::(lesson|strength|cardio))?$/.exec(raw || "");
+      if (m) {
+        var D = new Date(+m[1], +m[2] - 1, +m[3]);
+        if (D.getFullYear() === +m[1] && D.getMonth() === +m[2] - 1 && D.getDate() === +m[3]) return { kind: "day", date: D, part: m[4] || null };
+      }
+      return null;
+    }
+    function handleResetParam() {
+      var raw = null;
+      try { raw = new URLSearchParams(window.location.search).get("reset"); } catch (e) {}
+      if (raw === null) return;
+      try { window.history.replaceState(null, "", window.location.pathname + window.location.hash); } catch (e) {}
+      pendingToast = applyReset(parseResetSpec(raw));
+    }
+    function showToast(msg) {
+      var t = $("toast");
+      if (!t || !msg) return;
+      t.textContent = msg;
+      t.hidden = false;
+      if (showToast._t) clearTimeout(showToast._t);
+      showToast._t = setTimeout(function () { t.hidden = true; }, 5000);
+    }
+    var armedResetBtn = null, armedResetTimer = null;
+    function handleResetButton(btn) {
+      if (armedResetBtn === btn) {
+        clearTimeout(armedResetTimer); armedResetBtn = null;
+        btn.classList.remove("armed");
+        btn.textContent = btn.getAttribute("data-label");
+        var kind = btn.getAttribute("data-resetact");
+        var msg = applyReset({ kind: kind });
+        renderDays(); repaintAll();
+        showToast(msg);
+        return;
+      }
+      if (armedResetBtn) {
+        armedResetBtn.classList.remove("armed");
+        armedResetBtn.textContent = armedResetBtn.getAttribute("data-label");
+      }
+      armedResetBtn = btn;
+      btn.classList.add("armed");
+      btn.textContent = "Tap again to confirm";
+      clearTimeout(armedResetTimer);
+      armedResetTimer = setTimeout(function () {
+        if (armedResetBtn) {
+          armedResetBtn.classList.remove("armed");
+          armedResetBtn.textContent = armedResetBtn.getAttribute("data-label");
+          armedResetBtn = null;
+        }
+      }, 4000);
+    }
+
     /* =============== RENDER =============== */
     function strengthChunkHTML(day) {
       var st = store.days[day.id];
@@ -2155,8 +2405,13 @@
         '<button class="mode-btn" data-bb="0" data-day="' + day.id + '" aria-pressed="' + (!st.bb) + '">Dumbbells (default)</button>' +
         '<button class="mode-btn" data-bb="1" data-day="' + day.id + '" aria-pressed="' + (!!st.bb) + '">Barbell today</button></div>' +
         (st.bb ? '<p class="swap-line"><strong>With the barbell today:</strong> ' + day.bbSwap + '</p>' : '') : '';
-      return '<div class="chunk' + (st.sDone ? ' is-done' : '') + '" id="chunk-s-' + day.id + '">' +
+      var completeS = strengthDone(day);
+      var sessS = sessions[day.id] && sessions[day.id].strength;
+      var collapsedS = completeS && !(sessS && sessS.running) && !expandedChunks["s:" + day.id];
+      return '<div class="chunk' + (completeS ? ' is-done' : '') + (collapsedS ? ' is-collapsed' : '') + '" id="chunk-s-' + day.id + '">' +
         '<div class="chunk-top"><span class="chunk-tag tag-s">Strength</span><h3>' + day.strengthName + '</h3><span class="mins">20 min</span></div>' +
+        (collapsedS ? '<button class="chunk-expand" data-expandchunk="s" data-day="' + day.id + '">✓ Done — all ' + day.blocks.length + ' blocks ticked · tap to show the full session</button>' : '') +
+        '<div class="chunk-body">' +
         bbRow +
         '<ul class="blocks">' + blocks + '</ul>' +
         '<div class="player">' +
@@ -2166,9 +2421,9 @@
           '<div class="controls">' +
             '<button class="btn btn-start" data-start="s" data-day="' + day.id + '">▶ Start</button>' +
             '<button class="btn btn-reset" data-reset="s" data-day="' + day.id + '">Reset</button>' +
-            '<label class="done-wrap"><input type="checkbox" data-done="s" data-day="' + day.id + '"' + (st.sDone ? ' checked' : '') + ' /> Done</label>' +
+            '<label class="done-wrap"><input type="checkbox" data-done="s" data-day="' + day.id + '"' + (completeS ? ' checked' : '') + ' /> Done</label>' +
           '</div>' +
-        '</div></div>';
+        '</div></div></div>';
     }
     function walkChunkHTML(day) {
       var st = store.days[day.id];
@@ -2183,8 +2438,13 @@
         '<button class="mode-btn" data-mode="box" data-day="' + day.id + '" aria-pressed="' + (mode === "box") + '">Box</button></div>' +
         '<p class="suggest">Suggested today: <strong>' + CARDIO_SUGGEST[day.base] + '</strong> — a suggestion only; walk is always fine. Same ' + day.walkMin + ' minutes, same podcast queue, same progress in every mode.</p>' +
         (mode === "row" ? '<div class="mode-row"><span class="mr-k">Row intervals</span><button class="mode-btn" data-rowint="1" data-day="' + day.id + '" aria-pressed="' + (!!st.rowInt) + '">' + (st.rowInt ? "On" : "Off") + '</button><span class="suggest">Optional intervals in the middle block.</span></div>' : '');
-      return '<div class="chunk walk' + (st.wDone ? ' is-done' : '') + '" id="chunk-w-' + day.id + '">' +
+      var completeW = cardioDone(day);
+      var sessW = sessions[day.id] && sessions[day.id].walk;
+      var collapsedW = completeW && !(sessW && sessW.running) && !expandedChunks["w:" + day.id];
+      return '<div class="chunk walk' + (completeW ? ' is-done' : '') + (collapsedW ? ' is-collapsed' : '') + '" id="chunk-w-' + day.id + '">' +
         '<div class="chunk-top"><span class="chunk-tag tag-w">Cardio</span><h3>' + cardioTitle(day) + '</h3><span class="mins">' + day.walkMin + ' min</span></div>' +
+        (collapsedW ? '<button class="chunk-expand" data-expandchunk="w" data-day="' + day.id + '">✓ Done — all ' + cardioBlocks(day).length + ' phases ticked · tap to show the full session</button>' : '') +
+        '<div class="chunk-body">' +
         modeRow +
         '<ul class="blocks">' + blocks + '</ul>' +
         '<div class="player">' +
@@ -2194,9 +2454,16 @@
           '<div class="controls">' +
             '<button class="btn btn-start walk" data-start="w" data-day="' + day.id + '">▶ Start</button>' +
             '<button class="btn btn-reset" data-reset="w" data-day="' + day.id + '">Reset</button>' +
-            '<label class="done-wrap"><input type="checkbox" data-done="w" data-day="' + day.id + '"' + (st.wDone ? ' checked' : '') + ' /> Done</label>' +
+            '<label class="done-wrap"><input type="checkbox" data-done="w" data-day="' + day.id + '"' + (completeW ? ' checked' : '') + ' /> Done</label>' +
           '</div>' +
-        '</div></div>';
+        '</div></div></div>';
+    }
+    function queueProgText(day) {
+      var st = store.days[day.id];
+      var heard = Math.min(st.ep, day.episodes.length), total = 0, heardMin = 0;
+      day.episodes.forEach(function (e, i) { total += e.mins; if (i < st.ep) heardMin += e.mins; });
+      var left = Math.max(0, Math.round(total - heardMin));
+      return heard + " of " + day.episodes.length + " heard · " + (heard >= day.episodes.length ? "queue complete" : "~" + left + " min left");
     }
     function queueHTML(day) {
       var st = store.days[day.id];
@@ -2215,15 +2482,29 @@
           '<button class="heard-btn' + (i < st.ep ? ' on' : '') + '" data-heard="1" data-day="' + day.id + '" data-ep="' + i + '" aria-label="Mark episode ' + (i + 1) + ' as listened" title="Mark as listened">✓</button>' +
           '<span class="m">' + e.mins.toFixed(1) + ' min</span></li>';
       }).join("");
-      var totalListened = 0;
-      day.episodes.forEach(function (e, i) { if (i < st.ep) totalListened += e.mins; });
+      var expanded = !!expandedQueues[day.id];
+      var heard = Math.min(st.ep, day.episodes.length);
+      var body;
+      if (expanded) {
+        body = '<ol>' + lis + '</ol><div class="q-strip"><button class="q-show" data-hideq="' + day.id + '">Hide episode list</button></div>';
+      } else {
+        var nextEp = heard < day.episodes.length ? day.episodes[heard] : null;
+        var nowPlaying = nextEp && cur.dayId === day.id && cur.ep === heard;
+        body = '<div class="q-strip">' +
+          (nextEp
+            ? '<button class="q-next" data-playnext="' + day.id + '"><span class="qn-k">' + (nowPlaying ? 'Now playing' : 'Up next') + '</span>' + nextEp.title + ' · ' + nextEp.mins.toFixed(1) + ' min</button>'
+            : '<span class="q-next"><span class="qn-k">Queue complete</span>All ' + day.episodes.length + ' episodes heard ✓</span>') +
+          '<button class="q-show" data-showq="' + day.id + '">All ' + day.episodes.length + ' episodes</button></div>';
+      }
       return '<div class="queue"><div class="queue-head"><h3>Podcast queue — ' + day.episodes.length + ' episodes</h3>' +
-        '<span class="qprog" id="qprog-' + day.id + '">Episode ' + Math.min(st.ep + 1, day.episodes.length) + ' of ' + day.episodes.length + ' · ~' + totalListened.toFixed(0) + ' of ' + day.audioTotal.replace(/[^0-9.]/g, "") + ' min queued</span>' +
+        '<span class="qprog" id="qprog-' + day.id + '">' + queueProgText(day) + '</span>' +
         '<label class="done-wrap"><input type="checkbox" data-lesson="' + day.id + '"' + (lessonDone(day) ? ' checked' : '') + ' /> Lesson done</label></div>' +
-        '<ol>' + lis + '</ol></div>';
+        body + '</div>';
     }
     /* =============== CALENDAR =============== */
-    var focusIdx = todayIdx();   // the day shown in full; starts on today
+    var focusIdx = 0;            // index into the rolling 7-day window; INIT points it at today
+    var expandedChunks = {};     // "s:<dayId>" / "w:<dayId>" expanded after completion
+    var expandedQueues = {};     // dayId -> true while the full episode list is shown
     var previewSel = null;       // {p, w, d} while previewing a plan day read-only from the overview
     var ovOpen = {};             // overview phase cards the user has expanded (phase idx -> bool)
     var ovSig = null;            // signature of the last overview render, to skip needless rebuilds
@@ -2236,24 +2517,24 @@
     }
     function dayDate(i) { var d = weekMonday(); d.setDate(d.getDate() + i); return d; }
     function fmtDayDate(i) { var d = dayDate(i); return MONTH_S[d.getMonth()] + " " + d.getDate(); }
-    function renderCal(ti) {
+    function renderCal() {
       var strip = $("calStrip");
       if (!strip) return;
-      var mon = dayDate(0), sun = dayDate(6);
+      var asg = assignments();
+      var first = asg[0].date, last = asg[6].date, today = todayDate();
       var range = $("calRange");
       var wkN = phaseWeekN();
-      if (range) range.textContent = PHASE_NAMES[store.phase] + " · Week " + wkN + (wkN > 4 ? " — finishing the phase" : " of 4") + " · " + MONTH_S[mon.getMonth()] + " " + mon.getDate() + " – " + (sun.getMonth() === mon.getMonth() ? "" : MONTH_S[sun.getMonth()] + " ") + sun.getDate();
-      var assign = computeAssignments();
-      var base = store.phase * 28;
-      strip.innerHTML = DAYS.map(function (calDay, i) {
-        var day = PLAN[assign[i]];
-        var st = store.days[day.id];
-        var cls = "cal-day" + (i === ti ? " is-today" : "") + (i === focusIdx ? " is-sel" : "") + (i < ti ? " is-past" : "");
-        var meta = day.rest ? "Rest · " + day.walkMin + "m" : day.strengthName.split("·")[0].trim() + " · " + day.walkMin + "m";
-        var dots = (day.rest ? "" : '<i class="' + (st.sDone ? "on-s" : "") + '"></i>') + '<i class="' + (st.wDone ? "on-w" : "") + '"></i>' + '<i class="' + (lessonDone(day) ? "on-l" : "") + '"></i>';
-        return '<button class="' + cls + '" data-focus="' + i + '" aria-label="Open ' + calDay.day + (i === ti ? " (today)" : "") + (assign[i] - base !== i ? " — showing " + day.day + "'s plan (" + PHASE_NAMES[day.phase] + " week " + (day.week + 1) + ")" : "") + '">' +
-          '<span class="cd-dow">' + calDay.short + '</span>' +
-          '<span class="cd-num">' + dayDate(i).getDate() + '</span>' +
+      if (range) range.textContent = PHASE_NAMES[store.phase] + " · Week " + wkN + (wkN > 4 ? " — finishing the phase" : " of 4") + " · " + MONTH_S[first.getMonth()] + " " + first.getDate() + " – " + (last.getMonth() === first.getMonth() ? "" : MONTH_S[last.getMonth()] + " ") + last.getDate();
+      strip.innerHTML = asg.map(function (a, j) {
+        var day = a.day, D = a.date;
+        var isToday = sameDay(D, today), isPast = D < today;
+        var cls = "cal-day" + (isToday ? " is-today" : "") + (j === focusIdx ? " is-sel" : "") + (isPast ? " is-past" : "");
+        var meta = !day ? "" : (day.rest ? "Rest · " + day.walkMin + "m" : day.strengthName.split("·")[0].trim() + " · " + day.walkMin + "m");
+        var dots = !day ? "" : (day.rest ? "" : '<i class="' + (strengthDone(day) ? "on-s" : "") + '"></i>') + '<i class="' + (cardioDone(day) ? "on-w" : "") + '"></i>' + '<i class="' + (lessonDone(day) ? "on-l" : "") + '"></i>';
+        var moved = day && a.nominal && day.id !== a.nominal.id;
+        return '<button class="' + cls + '" data-focus="' + j + '" aria-label="Open ' + DAYS[mon0(D)].day + " " + MONTH_S[D.getMonth()] + " " + D.getDate() + (isToday ? " (today)" : "") + (moved ? " — running " + day.day + "'s plan (" + PHASE_NAMES[day.phase] + " week " + (day.week + 1) + ")" : "") + '">' +
+          '<span class="cd-dow">' + DAYS[mon0(D)].short + '</span>' +
+          '<span class="cd-num">' + D.getDate() + '</span>' +
           '<span class="cd-meta">' + meta + '</span>' +
           '<span class="cd-dots">' + dots + '</span>' +
           '</button>';
@@ -2261,10 +2542,11 @@
       var note = $("shiftNote");
       if (note) {
         var parts = [];
-        for (var j = ti; j < 7; j++) {
-          var relIdx = assign[j] - base;
-          if (relIdx < j) parts.push(DAYS[j].day + " now runs " + PLAN[assign[j]].day + "'s workout & lesson (" + PHASE_NAMES[store.phase] + " week " + (PLAN[assign[j]].week + 1) + ")");
-        }
+        asg.forEach(function (a) {
+          if (a.date >= today && a.day && a.nominal && a.day.id !== a.nominal.id && nominalDateForPlanDay(a.day) <= a.date) {
+            parts.push(DAYS[mon0(a.date)].day + " " + MONTH_S[a.date.getMonth()] + " " + a.date.getDate() + " now runs " + a.day.day + "'s workout & lesson (" + PHASE_NAMES[a.day.phase] + " week " + (a.day.week + 1) + ")");
+          }
+        });
         if (parts.length) { note.hidden = false; note.innerHTML = "<strong>Plan adjusted.</strong> Unfinished days moved up: " + parts.join(" · ") + ". Anything that no longer fits this phase's four weeks simply extends the phase."; }
         else { note.hidden = true; note.innerHTML = ""; }
       }
@@ -2322,7 +2604,7 @@
         var status = isCur
           ? (p === 2 && store.maintRounds > 0 ? "Maintenance · round " + store.maintRounds : "Current phase")
           : (isDone ? "Complete ✓" : "Locked");
-        var open = typeof ovOpen[p] === "boolean" ? ovOpen[p] : isCur;
+        var open = typeof ovOpen[p] === "boolean" ? ovOpen[p] : false;
         html += '<div class="ov-phase"><button class="ov-head" data-ovtoggle="' + p + '" aria-expanded="' + open + '">' +
           '<span class="ov-name">' + PHASE_NAMES[p] + '</span>' +
           '<span class="ov-status' + (isCur ? " cur" : (isDone ? " done" : "")) + '">' + status + '</span>' +
@@ -2352,13 +2634,12 @@
     }
 
     function dayStatusHTML(day) {
-      var st = store.days[day.id];
-      var complete = dayComplete(day), lDone = lessonDone(day);
+      var complete = dayComplete(day), lDone = lessonDone(day), sDone = strengthDone(day), wDone = cardioDone(day);
       return '<div class="day-status">' +
         (day.rest
           ? '<span class="ds-pill ok">Strength · rest day</span>'
-          : '<span class="ds-pill' + (st.sDone ? ' ok' : '') + '">Strength ' + (st.sDone ? '✓ done' : '· to do') + '</span>') +
-        '<span class="ds-pill' + (st.wDone ? ' ok' : '') + '">Cardio ' + (st.wDone ? '✓ done' : '· to do') + '</span>' +
+          : '<span class="ds-pill' + (sDone ? ' ok' : '') + '">Strength ' + (sDone ? '✓ done' : '· to do') + '</span>') +
+        '<span class="ds-pill' + (wDone ? ' ok' : '') + '">Cardio ' + (wDone ? '✓ done' : '· to do') + '</span>' +
         '<span class="ds-pill' + (lDone ? ' ok' : '') + '">Lesson ' + (lDone ? '✓ done' : '· to do') + '</span>' +
         '<button class="btn mark-btn' + (complete ? ' done' : '') + '" data-markday="' + day.id + '">' + (complete ? '✓ Day done — undo' : 'Mark day done') + '</button>' +
         '</div>';
@@ -2384,8 +2665,7 @@
        In preview mode (from the program overview) a plan day renders read-only:
        every control inside #days is disabled and clicks are swallowed. */
     function renderDays() {
-      var ti = todayIdx();
-      renderCal(ti);
+      renderCal();
       renderPhase();
       renderOverview();
       if (previewSel) {
@@ -2401,51 +2681,61 @@
         updateProgress();
         return;
       }
-      var assign = computeAssignments();
-      var calDay = DAYS[focusIdx], day = PLAN[assign[focusIdx]], i = focusIdx;
-      var rel = i === ti ? '<span class="today-chip">Today</span>'
-        : (i === ti + 1 ? '<span class="rel-chip">Tomorrow</span>'
-        : (i === ti - 1 ? '<span class="rel-chip">Yesterday</span>' : ''));
-      var moved = (assign[i] - store.phase * 28) !== i ? '<span class="rel-chip">Catch-up · ' + day.day + "'s plan · " + PHASE_NAMES[day.phase] + " wk " + (day.week + 1) + '</span>' : '';
-      var back = i !== ti ? '<button class="back-today" data-backtoday="1">← Back to today</button>' : '';
-      $("days").innerHTML = daySectionHTML(day, calDay.day, fmtDayDate(i), rel + moved + back);
+      var a = assignments()[focusIdx], day = a.day, today = todayDate();
+      var diff = daysBetween(today, a.date);
+      var rel = diff === 0 ? '<span class="today-chip">Today</span>'
+        : (diff === 1 ? '<span class="rel-chip">Tomorrow</span>'
+        : (diff === -1 ? '<span class="rel-chip">Yesterday</span>' : ''));
+      var moved = a.nominal && day.id !== a.nominal.id ? '<span class="rel-chip">Catch-up · ' + day.day + "'s plan · " + PHASE_NAMES[day.phase] + " wk " + (day.week + 1) + '</span>' : '';
+      var back = diff !== 0 ? '<button class="back-today" data-backtoday="1">← Back to today</button>' : '';
+      $("days").innerHTML = daySectionHTML(day, DAYS[mon0(a.date)].day, MONTH_S[a.date.getMonth()] + " " + a.date.getDate(), rel + moved + back);
       updateProgress();
     }
     function updateProgress() {
-      var assign = computeAssignments(), seen = {}, list = [];
-      assign.forEach(function (pi) { if (!seen[pi]) { seen[pi] = 1; list.push(PLAN[pi]); } });
-      var s = 0, w = 0, l = 0;
-      list.forEach(function (d) {
-        var st = store.days[d.id];
-        if (!d.rest && st.sDone) s++;
-        if (st.wDone) w += d.walkMin;
+      /* Every header number is derived here from the same per-portion ticks
+         the day view shows, over the rolling window's tracked dates only —
+         denominators count only the days that exist in the window. */
+      var asg = assignments();
+      var s = 0, w = 0, l = 0, dd = 0, sDen = 0, wDen = 0, lDen = 0;
+      asg.forEach(function (a) {
+        var d = a.day;
+        if (!d) return;
+        if (!d.rest) { sDen++; if (strengthDone(d)) s++; }
+        wDen += d.walkMin;
+        if (cardioDone(d)) w += d.walkMin;
+        lDen++;
         if (lessonDone(d)) l++;
+        if (dayComplete(d)) dd++;
       });
+      $("progDays").textContent = dd;
+      $("progDaysDen").textContent = " / " + asg.length + " days";
+      $("barDays").style.width = (asg.length ? dd / asg.length * 100 : 0) + "%";
       $("progStrength").textContent = s;
-      $("barStrength").style.width = (s / 5 * 100) + "%";
+      $("progStrengthDen").textContent = " / " + sDen + " sessions";
+      $("barStrength").style.width = (sDen ? s / sDen * 100 : 0) + "%";
       $("progWalk").textContent = w;
-      $("barWalk").style.width = (w / 320 * 100) + "%";
+      $("progWalkDen").textContent = " / " + wDen + " min";
+      $("barWalk").style.width = (wDen ? w / wDen * 100 : 0) + "%";
       var pl = $("progLesson"); if (pl) pl.textContent = l;
-      var bl2 = $("barLesson"); if (bl2) bl2.style.width = (l / 7 * 100) + "%";
-      renderCal(todayIdx());
+      var pld = $("progLessonDen"); if (pld) pld.textContent = " / " + lDen + " concepts";
+      var bl2 = $("barLesson"); if (bl2) bl2.style.width = (lDen ? l / lDen * 100 : 0) + "%";
+      renderCal();
       renderPhase();
     }
     function refreshDayBits(day) {
       // done styling + queue highlights after state changes
       var st = store.days[day.id];
       var cs = $("chunk-s-" + day.id), cw = $("chunk-w-" + day.id);
-      if (cs) cs.classList.toggle("is-done", !!st.sDone);
-      if (cw) cw.classList.toggle("is-done", !!st.wDone);
+      if (cs) cs.classList.toggle("is-done", strengthDone(day));
+      if (cw) cw.classList.toggle("is-done", cardioDone(day));
       var q = document.querySelectorAll('#day-' + day.id + ' .queue li');
       q.forEach(function (li, i) {
         li.classList.toggle("finished", i < st.ep);
         li.classList.toggle("playing", cur.dayId === day.id && cur.ep === i);
         li.classList.toggle("ext-failed", embedFailedKey === epKey(day.id, i));
       });
-      var totalListened = 0;
-      day.episodes.forEach(function (e, i) { if (i < st.ep) totalListened += e.mins; });
       var qp = $("qprog-" + day.id);
-      if (qp) qp.textContent = "Episode " + Math.min(st.ep + 1, day.episodes.length) + " of " + day.episodes.length + " · ~" + totalListened.toFixed(0) + " of " + day.audioTotal.replace(/[^0-9.]/g, "") + " min queued";
+      if (qp && day.episodes.length) qp.textContent = queueProgText(day);
       updateProgress();
     }
 
@@ -2634,7 +2924,7 @@
       if (embedFailedKey === epKey(cur.dayId, cur.ep)) showOpenFallback();
     }
     $("pbPlay").addEventListener("click", function () {
-      if (!cur.dayId) { ensureQueue(slotFor(todayIdx()).id, true); return; }
+      if (!cur.dayId) { ensureQueue(todayPlanDay().id, true); return; }
       if (audio.paused) tryPlay();
       else audio.pause();
     });
@@ -2826,8 +3116,9 @@
         if (canAdvance() && store.phase < 2) {
           store.phase++;
           store.phaseStart = dateISO(new Date());
+          store.phaseStarts[store.phase] = store.phaseStart;
           previewSel = null;
-          focusIdx = todayIdx();
+          focusIdx = todayWinIdx();
           save();
           renderDays(); repaintAll();
           window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2841,8 +3132,9 @@
           for (var mi = 56; mi < 84; mi++) delete store.days[PLAN[mi].id];
           initDayDefaults();
           store.phaseStart = dateISO(new Date());
+          store.phaseStarts[2] = store.phaseStart;
           previewSel = null;
-          focusIdx = todayIdx();
+          focusIdx = todayWinIdx();
           save();
           renderDays(); repaintAll();
           window.scrollTo({ top: 0, behavior: "smooth" });
@@ -2852,7 +3144,7 @@
       var ovBtn = e.target.closest("[data-ovtoggle]");
       if (ovBtn) {
         var op = parseInt(ovBtn.getAttribute("data-ovtoggle"), 10);
-        var curOpen = typeof ovOpen[op] === "boolean" ? ovOpen[op] : op === store.phase;
+        var curOpen = typeof ovOpen[op] === "boolean" ? ovOpen[op] : false;
         ovOpen[op] = !curOpen;
         ovSig = null;
         renderOverview();
@@ -2871,15 +3163,15 @@
       if (focusBtn) {
         focusIdx = parseInt(focusBtn.getAttribute("data-focus"), 10);
         renderDays(); repaintAll();
-        var fel = $("day-" + slotFor(focusIdx).id);
+        var fel = $("day-" + assignments()[focusIdx].day.id);
         if (fel) fel.scrollIntoView();
         return;
       }
       var btBtn = e.target.closest("[data-backtoday]");
       if (btBtn) {
-        focusIdx = todayIdx();
+        focusIdx = todayWinIdx();
         renderDays(); repaintAll();
-        var bel = $("day-" + slotFor(focusIdx).id);
+        var bel = $("day-" + assignments()[focusIdx].day.id);
         if (bel) bel.scrollIntoView();
         return;
       }
@@ -2932,6 +3224,38 @@
         renderDays(); repaintAll();
         return;
       }
+      var exBtn = e.target.closest("[data-expandchunk]");
+      if (exBtn) {
+        expandedChunks[exBtn.getAttribute("data-expandchunk") + ":" + exBtn.getAttribute("data-day")] = true;
+        renderDays(); repaintAll();
+        return;
+      }
+      var showBtn = e.target.closest("[data-showq]");
+      if (showBtn) {
+        expandedQueues[showBtn.getAttribute("data-showq")] = true;
+        renderDays(); repaintAll();
+        return;
+      }
+      var hideBtn = e.target.closest("[data-hideq]");
+      if (hideBtn) {
+        delete expandedQueues[hideBtn.getAttribute("data-hideq")];
+        renderDays(); repaintAll();
+        return;
+      }
+      var pnBtn = e.target.closest("[data-playnext]");
+      if (pnBtn) {
+        var pnDay = dayById(pnBtn.getAttribute("data-playnext"));
+        var pst = store.days[pnDay.id];
+        var pidx = Math.min(pst.ep, pnDay.episodes.length - 1);
+        if (pidx < 0) return;
+        if (embedFailedKey === epKey(pnDay.id, pidx)) { openEpisodeExternally(pnDay.id, pidx); return; }
+        pst.pos = 0; save();
+        if (cur.dayId === pnDay.id && cur.ep === pidx) { if (audio.paused) tryPlay(); }
+        else loadEpisode(pnDay.id, pidx, true);
+        return;
+      }
+      var raBtn = e.target.closest("[data-resetact]");
+      if (raBtn) { handleResetButton(raBtn); return; }
       var li = e.target.closest(".queue li");
       if (li && !e.target.closest("a")) {
         var dId = li.getAttribute("data-day"), idx = parseInt(li.getAttribute("data-ep"), 10);
@@ -2971,16 +3295,19 @@
     });
 
     /* =============== INIT =============== */
+    focusIdx = todayWinIdx();
+    handleResetParam();   // a ?reset=… link applies once, before the first render
     applyRate();
     renderDays();
     updateProgress();
+    if (pendingToast) { showToast(pendingToast); pendingToast = null; }
     (function () {
       var t = $("coachToggle");
       t.setAttribute("aria-pressed", store.coach ? "true" : "false");
       t.textContent = store.coach ? "Coach: On" : "Coach: Off";
       // restore today's sessions' displays + preload today's queue position (no autoplay)
       repaintAll();
-      var tId = slotFor(todayIdx()).id, tst = store.days[tId];
+      var tId = todayPlanDay().id, tst = store.days[tId];
       if ((tst.ep > 0 || tst.pos > 0) && dayById(tId).episodes.length) { cur.dayId = tId; loadEpisode(tId, tst.ep, false); }
     })();
     </script>
