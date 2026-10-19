@@ -301,6 +301,7 @@
       .day.focus { margin-top: 22px; }
       .day-head .day-date { font-size: 15px; font-weight: 600; color: var(--muted); }
       .day-head .rel-chip { background: var(--panel-2); color: var(--muted); border: 1px solid var(--line); font-size: 12px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; padding: 3px 9px; border-radius: 99px; }
+      .catch-chip { background: var(--gold-soft); color: var(--ink); border: 1px solid var(--gold); font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; padding: 3px 9px; border-radius: 99px; white-space: nowrap; }
       .back-today {
         font: inherit; font-size: 13px; font-weight: 700; cursor: pointer;
         background: var(--panel-2); color: var(--ink); border: 1px solid var(--line);
@@ -951,13 +952,14 @@
       if (mode === "box") return "Boxing";
       return day.walkKind === "easy60" ? "Recovery walk" : day.walkKind === "steady60" ? "Long steady walk" : "Brisk walk";
     }
-    function cardioStartCue(day) {
+    function cardioStartCue(day, concept) {
       var mode = cardioMode(day), st = store.days[day.id];
-      if (mode === "row") return "Rowing started. Today's concept: " + day.concept + ". Five minutes easy at eighteen to twenty strokes a minute" + (st.rowInt ? ", then intervals: six rounds of three minutes stronger at twenty-four to twenty-six, two minutes easy." : ", then steady at twenty-two to twenty-four — talk-test effort.") + " The podcast runs from here; I will check in at halfway.";
-      if (mode === "box") return "Boxing started. Today's concept: " + day.concept + ". " + (day.walkMin === 60 ? "Five" : "Four") + " minutes of easy shadow work to warm up, then " + (day.walkMin === 60 ? "ten" : "eight") + " rounds — three minutes on, one minute off. I will call every round and name the combo; the podcast ducks only for those calls.";
-      if (day.walkKind === "easy60") return "Recovery walk started. Today's concept: " + day.concept + ". Easy pace the whole way, RPE three to four — family pace is perfect. The podcast runs uninterrupted from here.";
-      if (day.walkKind === "steady60") return "Long walk started. Today's concept: " + day.concept + ". Five minutes easy, then steady at RPE five for fifty. The podcast runs uninterrupted from here.";
-      return "Walk started. Today's concept: " + day.concept + ". Five minutes easy to warm up, then brisk and steady — full phrases, slightly breathless, RPE five to six." + (day.intervals ? " Optional today: four two-minute faster pickups inside the middle block." : "");
+      concept = concept || day.concept;
+      if (mode === "row") return "Rowing started. Today's concept: " + concept + ". Five minutes easy at eighteen to twenty strokes a minute" + (st.rowInt ? ", then intervals: six rounds of three minutes stronger at twenty-four to twenty-six, two minutes easy." : ", then steady at twenty-two to twenty-four — talk-test effort.") + " The podcast runs from here; I will check in at halfway.";
+      if (mode === "box") return "Boxing started. Today's concept: " + concept + ". " + (day.walkMin === 60 ? "Five" : "Four") + " minutes of easy shadow work to warm up, then " + (day.walkMin === 60 ? "ten" : "eight") + " rounds — three minutes on, one minute off. I will call every round and name the combo; the podcast ducks only for those calls.";
+      if (day.walkKind === "easy60") return "Recovery walk started. Today's concept: " + concept + ". Easy pace the whole way, RPE three to four — family pace is perfect. The podcast runs uninterrupted from here.";
+      if (day.walkKind === "steady60") return "Long walk started. Today's concept: " + concept + ". Five minutes easy, then steady at RPE five for fifty. The podcast runs uninterrupted from here.";
+      return "Walk started. Today's concept: " + concept + ". Five minutes easy to warm up, then brisk and steady — full phrases, slightly breathless, RPE five to six." + (day.intervals ? " Optional today: four two-minute faster pickups inside the middle block." : "");
     }
     function cardioHalfCue(day) {
       var mode = cardioMode(day);
@@ -2068,6 +2070,19 @@
       });
     }
     initDayDefaults();
+    /* migrate whole-day pins saved by the bundled version (a bare plan-day
+       id per date in store.calAssign) into per-track pins: that day supplies
+       the date's lesson, and its strength session unless it was a rest day.
+       Cardio is not carried over — from now on every date runs its own
+       scheduled cardio. */
+    Object.keys(store.calAssign).forEach(function (iso) {
+      var v = store.calAssign[iso];
+      if (typeof v === "string") {
+        var pd = dayById(v);
+        if (pd) store.calAssign[iso] = { s: pd.rest ? null : pd.id, l: pd.id };
+        else delete store.calAssign[iso];
+      }
+    });
     function save() { try { localStorage.setItem(LS_KEY, JSON.stringify(store)); } catch (e) {} }
     save();
 
@@ -2091,12 +2106,12 @@
     function dayById(id) { for (var i = 0; i < PLAN.length; i++) if (PLAN[i].id === id) return PLAN[i]; return null; }
     function todayIdx() { var js = new Date().getDay(); return js === 0 ? 6 : js - 1; } // Mon=0..Sun=6
 
-    /* =============== DAILY TRACKING + AUTO-ADJUST ===============
+    /* =============== DAILY TRACKING ===============
        A plan day counts as done only when every portion is ticked:
-       strength (or a rest day), cardio, and the lesson. Past days keep
-       the plan they were scheduled; today inherits the earliest
-       unfinished plan day, and later days flow on from there in
-       order — nothing is skipped or lost. */
+       strength (or a rest day), cardio, and the lesson. Done state is
+       always derived from the per-portion ticks (below) — and each of the
+       three tracks re-flows on its own (see DECOUPLED TRACKS), so an
+       unfinished lesson never holds up the day's workout cards. */
     function lessonDone(day) {
       var st = store.days[day.id];
       return day.episodes.length ? st.ep >= day.episodes.length : !!st.lDone;
@@ -2107,9 +2122,6 @@
        shows, and unticking any single portion updates every one of them. */
     function strengthDone(day) { return day.rest ? true : blocksAll(day, "s"); }
     function cardioDone(day) { return blocksAll(day, "w"); }
-    function dayComplete(day) {
-      return strengthDone(day) && cardioDone(day) && lessonDone(day);
-    }
     /* =============== ROLLING 7-DAY WINDOW ===============
        The tracker frames a rolling window of 7 consecutive dates — 3 days
        before today, today, 3 days after — with a hard floor at the tracker
@@ -2117,13 +2129,12 @@
        starts sliding once today − 3 passes Oct 18. Dates before the start
        do not exist in the tracker at all: no cards, no catch-up debt, and
        their portions never count toward phase completion.
-       Every tracked date maps to a plan day. Plan days follow the phase
-       day by day from the phase start (phase 0 starts 2026-10-18): the
-       week template advances every 7 days and the session follows the
-       date's own weekday. Past dates keep the plan they ran (persisted in
-       store.calAssign, keyed by date); today inherits the earliest
-       unfinished tracked plan day of the phase (catch-up); later dates
-       flow on from there in order — nothing is skipped or lost. */
+       Plan days follow the phase day by day from the phase start (phase 0
+       starts 2026-10-18): the week template advances every 7 days and the
+       session follows the date's own weekday. What each date renders is
+       resolved per track (see DECOUPLED TRACKS below); the resolution for
+       past dates and today is pinned per date in store.calAssign so a
+       date keeps the tracks it was given. */
     function addDays(d, n) { var x = new Date(d.getFullYear(), d.getMonth(), d.getDate()); x.setDate(x.getDate() + n); return x; }
     function todayDate() { var d = new Date(); d.setHours(0, 0, 0, 0); return d; }
     function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
@@ -2156,24 +2167,92 @@
       for (var k = 0; k < 28; k++) { if (planDayForOffset(day.phase, k).id === day.id) return addDays(start, k); }
       return start;
     }
-    function todayEffective() {
-      var today = todayDate(), p = store.phase;
-      var kToday = daysBetween(phaseStartDate(p), today);
-      for (var k = 0; k <= Math.min(kToday, 27); k++) {
+    /* =============== DECOUPLED TRACKS ===============
+       Strength, cardio and lessons re-flow independently — an unfinished
+       item holds up only its own track, never the day's other cards.
+       · STRENGTH: sessions form a queue in scheduled order. A date renders
+         the queue's front — its own session, or the earliest missed one,
+         with a Catch-up chip on the strength card only. One session per
+         day, order preserved; rest days float, so a session the queue
+         pushes onto a scheduled rest day renders there.
+       · LESSON: concepts form a queue in scheduled order. A date renders
+         the front concept — its scheduled one, or the earliest unfinished
+         one, with a Catch-up chip on the queue card only. An unfinished
+         concept stays at the front; later concepts shift behind it. The
+         lesson track never changes which workout or cardio cards render.
+       · CARDIO: every date renders its own scheduled cardio (40 min, or
+         60 on scheduled rest days). Missed cardio is forgiven — it does
+         not roll, stack, or shift anything.
+       Ticks stay keyed to the plan day that owns each portion, so phase
+       portions, gating and stats are exactly as before — only the
+       scheduling/presentation is decoupled. */
+    function trackQueue(p, track) {
+      var q = [];
+      for (var k = 0; k < 28; k++) {
         var d = planDayForOffset(p, k);
-        if (!dayComplete(d)) return { day: d, k: k };
+        if (track === "s" && d.rest) continue;
+        q.push({ day: d, sched: addDays(phaseStartDate(p), k) });
       }
-      return { day: nominalPlanDay(today), k: kToday };
+      return q;
     }
-    function effectivePlanDayForDate(D) {
-      var today = todayDate();
-      if (sameDay(D, today)) return todayEffective().day;
-      if (D < today) {
-        var sid = store.calAssign[dateISO(D)];
-        var sd = sid ? dayById(sid) : null;
-        return sd || nominalPlanDay(D);
+    function pinFor(iso, p) {
+      var pin = store.calAssign[iso];
+      if (!pin || typeof pin !== "object") return null;
+      var l = pin.l ? dayById(pin.l) : null;
+      if (!l || l.phase !== p) return null;
+      var s = pin.s ? dayById(pin.s) : null;
+      if (pin.s && (!s || s.rest)) return null;
+      return { s: s, l: l };
+    }
+    function simulateDate(D) {
+      /* Walk the phase day by day from its start to D, draining each
+         track's queue from the live ticks. Dates before today use the
+         ticks as they stand; from today on, each rendered front item is
+         assumed finished that day, so later dates project the next item
+         in that track's queue. */
+      var p = phaseForDate(D), nom = nominalPlanDay(D);
+      var comp = { date: D, iso: dateISO(D), nominal: nom, sDay: null, sCatch: false, cDay: nom, lDay: nom, lCatch: false };
+      if (p < 0 || !nom) return comp;
+      var S = phaseStartDate(p), today = todayDate();
+      var sq = trackQueue(p, "s"), lq = trackQueue(p, "l");
+      var todayPin = pinFor(dateISO(today), p);
+      var assumedS = {}, assumedL = {}, sFront = null, lFront = null, d = new Date(S.getTime());
+      while (d <= D) {
+        sFront = null; lFront = null;
+        for (var i = 0; i < sq.length; i++) { if (sq[i].sched > d) break; if (!assumedS[sq[i].day.id] && !strengthDone(sq[i].day)) { sFront = sq[i]; break; } }
+        for (var j = 0; j < lq.length; j++) { if (lq[j].sched > d) break; if (!assumedL[lq[j].day.id] && !lessonDone(lq[j].day)) { lFront = lq[j]; break; } }
+        if (sameDay(d, today) && todayPin) {
+          /* today's rendered tracks are pinned — the queues drain from what
+             today actually shows, not from a front recomputed off live ticks
+             (today may be showing an earlier carried-over item) */
+          sFront = todayPin.s ? { day: todayPin.s } : null;
+          lFront = { day: todayPin.l };
+        }
+        if (sameDay(d, D)) break;
+        if (d >= today) { if (sFront) assumedS[sFront.day.id] = 1; if (lFront) assumedL[lFront.day.id] = 1; }
+        d = addDays(d, 1);
       }
-      return nominalPlanDay(D);
+      if (sFront) { comp.sDay = sFront.day; comp.sCatch = nom.rest || sFront.day.id !== nom.id; }
+      else if (!nom.rest) comp.sDay = nom;   // every session up to here is ticked — the date's own, complete
+      if (lFront) { comp.lDay = lFront.day; comp.lCatch = lFront.day.id !== nom.id; }
+      return comp;
+    }
+    function resolveDate(D) {
+      var iso = dateISO(D), nom = nominalPlanDay(D), today = todayDate();
+      var comp = { date: D, iso: iso, nominal: nom, sDay: null, sCatch: false, cDay: nom, lDay: nom, lCatch: false };
+      if (!nom) return comp;
+      if (D <= today) {
+        var pin = pinFor(iso, phaseForDate(D));
+        if (pin) {
+          comp.lDay = pin.l; comp.lCatch = pin.l.id !== nom.id;
+          comp.sDay = pin.s || (nom.rest ? null : nom);
+          comp.sCatch = !!pin.s && (nom.rest || pin.s.id !== nom.id);
+          return comp;
+        }
+      }
+      comp = simulateDate(D);
+      if (D <= today) { store.calAssign[iso] = { s: comp.sDay ? comp.sDay.id : null, l: comp.lDay.id }; save(); }
+      return comp;
     }
     function windowStartDate() {
       var s = addDays(todayDate(), -3);
@@ -2181,27 +2260,17 @@
     }
     function todayWinIdx() { return daysBetween(windowStartDate(), todayDate()); }
     function assignments() {
-      var start = windowStartDate(), today = todayDate(), te = null, out = [];
-      for (var j = 0; j < 7; j++) {
-        var D = addDays(start, j), iso = dateISO(D), nom = nominalPlanDay(D), day = null;
-        if (D < today) {
-          var sid = store.calAssign[iso];
-          day = sid ? dayById(sid) : null;
-          if (!day) day = nom;
-        } else if (sameDay(D, today)) {
-          if (!te) te = todayEffective();
-          day = te.day;
-        } else {
-          if (!te) te = todayEffective();
-          day = planDayForOffset(store.phase, te.k + daysBetween(today, D));
-        }
-        if (!day) day = nom;
-        if (day && D <= today && store.calAssign[iso] !== day.id) { store.calAssign[iso] = day.id; save(); }
-        out.push({ date: D, iso: iso, day: day, nominal: nom });
-      }
+      var start = windowStartDate(), out = [];
+      for (var j = 0; j < 7; j++) out.push(resolveDate(addDays(start, j)));
       return out;
     }
-    function todayPlanDay() { return assignments()[todayWinIdx()].day; }
+    function todayView() { return assignments()[todayWinIdx()]; }
+    /* a tracked date is fully done when each of its three tracks is done:
+       the strength session it rendered (if any), its own cardio, and the
+       lesson at the front of its queue */
+    function viewComplete(v) {
+      return !!v.cDay && (!v.sDay || strengthDone(v.sDay)) && cardioDone(v.cDay) && lessonDone(v.lDay);
+    }
 
     /* =============== PHASE GATING ===============
        A phase unlocks the next only when 100% of its portions are ticked
@@ -2261,13 +2330,6 @@
       else st.lDone = val;
       save();
     }
-    function setDayMarked(day, val) {
-      if (!day.rest) setChunkDone(day, "s", val);
-      setChunkDone(day, "w", val);
-      setLessonDone(day, val);
-      save();
-    }
-
     /* =============== RESETS ===============
        State lives only in this browser's local storage, so resets run here
        in the app: from the Reset panel, or from a ?reset= link handled once
@@ -2284,7 +2346,6 @@
     function clearLessonTicks(day) { var st = store.days[day.id]; st.ep = 0; st.pos = 0; st.lDone = false; }
     function clearStrengthTicks(day) { var st = store.days[day.id]; st.sBlocks = []; st.sDone = false; }
     function clearCardioTicks(day) { var st = store.days[day.id]; st.wBlocks = []; st.wDone = false; }
-    function clearDayTicks(day) { if (!day.rest) clearStrengthTicks(day); clearCardioTicks(day); clearLessonTicks(day); }
     function fmtDateShort(D) { return MONTH_S[D.getMonth()] + " " + D.getDate(); }
     function applyReset(spec) {
       if (!spec) return "That reset option wasn't recognised — nothing was changed.";
@@ -2305,27 +2366,41 @@
         expandedChunks = {}; expandedQueues = {};
         msg = "All progress reset — every tick, phase progress and catch-up state cleared. Playback speed and coach setting kept.";
       } else if (spec.kind === "week") {
-        var seen = {};
-        assignments().forEach(function (a) { if (a.day && !seen[a.day.id]) { seen[a.day.id] = 1; clearDayTicks(a.day); } });
+        var sSet = {}, cSet = {}, lSet = {};
+        assignments().forEach(function (a) {
+          if (a.sDay && !sSet[a.sDay.id]) { sSet[a.sDay.id] = 1; clearStrengthTicks(a.sDay); }
+          if (a.cDay && !cSet[a.cDay.id]) { cSet[a.cDay.id] = 1; clearCardioTicks(a.cDay); }
+          if (a.lDay && !lSet[a.lDay.id]) { lSet[a.lDay.id] = 1; clearLessonTicks(a.lDay); }
+        });
         msg = "7-day window reset — ticks cleared for every day in the current window.";
       } else if (spec.kind === "today" || spec.kind === "today-lesson") {
-        var td = todayPlanDay();
-        if (!td) return "No tracked plan for today — nothing was changed.";
-        if (spec.kind === "today") { clearDayTicks(td); msg = "Today reset — all ticks cleared for today's plan (" + td.day + ")."; }
-        else { clearLessonTicks(td); msg = "Today's lesson reset — episode ticks cleared; strength and cardio ticks kept."; }
+        var tv = todayView();
+        if (!tv.cDay) return "No tracked plan for today — nothing was changed.";
+        if (spec.kind === "today") {
+          if (tv.sDay) clearStrengthTicks(tv.sDay);
+          clearCardioTicks(tv.cDay);
+          clearLessonTicks(tv.lDay);
+          msg = "Today reset — strength, cardio and lesson ticks cleared for today.";
+        }
+        else { clearLessonTicks(tv.lDay); msg = "Today's lesson reset — episode ticks cleared; strength and cardio ticks kept."; }
       } else if (spec.kind === "day") {
         var D = spec.date;
         if (D < START_DATE) return fmtDateShort(D) + " is before the tracker start (Oct 18, 2026) — nothing to reset.";
-        var day = effectivePlanDayForDate(D);
-        if (!day) return "No tracked plan for " + fmtDateShort(D) + " — nothing was changed.";
+        var view = resolveDate(D);
+        if (!view.cDay) return "No tracked plan for " + fmtDateShort(D) + " — nothing was changed.";
         var label = fmtDateShort(D) + " (" + DAYS[mon0(D)].day + ")";
-        if (spec.part === "lesson") { clearLessonTicks(day); msg = label + " — lesson reset: episode ticks cleared; workout and cardio ticks kept."; }
+        if (spec.part === "lesson") { clearLessonTicks(view.lDay); msg = label + " — lesson reset: episode ticks cleared; workout and cardio ticks kept."; }
         else if (spec.part === "strength") {
-          if (day.rest) return label + " runs a rest-day plan — no strength ticks to clear.";
-          clearStrengthTicks(day); msg = label + " — strength ticks cleared.";
+          if (!view.sDay) return label + " runs a rest-day plan — no strength ticks to clear.";
+          clearStrengthTicks(view.sDay); msg = label + " — strength ticks cleared.";
         }
-        else if (spec.part === "cardio") { clearCardioTicks(day); msg = label + " — cardio ticks cleared."; }
-        else { clearDayTicks(day); msg = label + " — all ticks cleared for that day's plan."; }
+        else if (spec.part === "cardio") { clearCardioTicks(view.cDay); msg = label + " — cardio ticks cleared."; }
+        else {
+          if (view.sDay) clearStrengthTicks(view.sDay);
+          clearCardioTicks(view.cDay);
+          clearLessonTicks(view.lDay);
+          msg = label + " — all ticks cleared for that day's plan.";
+        }
       } else {
         return "That reset option wasn't recognised — nothing was changed.";
       }
@@ -2389,14 +2464,15 @@
     }
 
     /* =============== RENDER =============== */
-    function strengthChunkHTML(day) {
+    function restChunkHTML() {
+      return '<div class="chunk rest">' +
+        '<div class="chunk-top"><span class="chunk-tag tag-s">Strength</span><h3>Rest day</h3></div>' +
+        '<p class="note">No strength today — recovery is part of the plan. The cardio stretches to a full 60 minutes, and the podcast queue still runs: one concept, gone deep, at an easy pace.</p>' +
+        '</div>';
+    }
+    function strengthChunkHTML(day, catchText) {
       var st = store.days[day.id];
-      if (day.rest) {
-        return '<div class="chunk rest">' +
-          '<div class="chunk-top"><span class="chunk-tag tag-s">Strength</span><h3>Rest day</h3></div>' +
-          '<p class="note">No strength today — recovery is part of the plan. The cardio stretches to a full 60 minutes, and the podcast queue still runs: one concept, gone deep, at an easy pace.</p>' +
-          '</div>';
-      }
+      if (day.rest) return restChunkHTML();
       var blocks = day.blocks.map(function (b, bi) {
         return '<li><label class="blk-tick"><input type="checkbox" data-block="s" data-day="' + day.id + '" data-idx="' + bi + '"' + (st.sBlocks[bi] ? ' checked' : '') + ' /><span><b>' + b.b + '</b> — ' + b.d + (b.s ? ' <span class="sub">' + b.s + '.</span>' : '') + '</span></label></li>';
       }).join("");
@@ -2409,7 +2485,7 @@
       var sessS = sessions[day.id] && sessions[day.id].strength;
       var collapsedS = completeS && !(sessS && sessS.running) && !expandedChunks["s:" + day.id];
       return '<div class="chunk' + (completeS ? ' is-done' : '') + (collapsedS ? ' is-collapsed' : '') + '" id="chunk-s-' + day.id + '">' +
-        '<div class="chunk-top"><span class="chunk-tag tag-s">Strength</span><h3>' + day.strengthName + '</h3><span class="mins">20 min</span></div>' +
+        '<div class="chunk-top"><span class="chunk-tag tag-s">Strength</span><h3>' + day.strengthName + '</h3>' + (catchText ? '<span class="catch-chip">' + catchText + '</span>' : '') + '<span class="mins">20 min</span></div>' +
         (collapsedS ? '<button class="chunk-expand" data-expandchunk="s" data-day="' + day.id + '">✓ Done — all ' + day.blocks.length + ' blocks ticked · tap to show the full session</button>' : '') +
         '<div class="chunk-body">' +
         bbRow +
@@ -2465,10 +2541,11 @@
       var left = Math.max(0, Math.round(total - heardMin));
       return heard + " of " + day.episodes.length + " heard · " + (heard >= day.episodes.length ? "queue complete" : "~" + left + " min left");
     }
-    function queueHTML(day) {
+    function queueHTML(day, catchText) {
       var st = store.days[day.id];
+      var chip = catchText ? '<span class="catch-chip">' + catchText + '</span>' : '';
       if (!day.episodes.length) {
-        return '<div class="queue"><div class="queue-head"><h3>Podcast queue — ' + day.concept + '</h3>' +
+        return '<div class="queue"><div class="queue-head"><h3>Podcast queue — ' + day.concept + '</h3>' + chip +
           '<label class="done-wrap"><input type="checkbox" data-lesson="' + day.id + '"' + (lessonDone(day) ? ' checked' : '') + ' /> Lesson done</label></div>' +
           '<ol><li style="cursor:default;"><span class="t" style="color:var(--muted);">The episode queue for this concept arrives with the next episode drop. Until then, cover the concept your way — a course, a chapter, your notes — and tick <strong>Lesson done</strong> when it is properly in. Timers and the coach still run; there is just no queue to play yet.</span></li></ol></div>';
       }
@@ -2496,13 +2573,14 @@
             : '<span class="q-next"><span class="qn-k">Queue complete</span>All ' + day.episodes.length + ' episodes heard ✓</span>') +
           '<button class="q-show" data-showq="' + day.id + '">All ' + day.episodes.length + ' episodes</button></div>';
       }
-      return '<div class="queue"><div class="queue-head"><h3>Podcast queue — ' + day.episodes.length + ' episodes</h3>' +
+      return '<div class="queue"><div class="queue-head"><h3>Podcast queue — ' + day.episodes.length + ' episodes</h3>' + chip +
         '<span class="qprog" id="qprog-' + day.id + '">' + queueProgText(day) + '</span>' +
         '<label class="done-wrap"><input type="checkbox" data-lesson="' + day.id + '"' + (lessonDone(day) ? ' checked' : '') + ' /> Lesson done</label></div>' +
         body + '</div>';
     }
     /* =============== CALENDAR =============== */
     var focusIdx = 0;            // index into the rolling 7-day window; INIT points it at today
+    var curView = null;          // the composite view currently rendered in #days (per-track plan days)
     var expandedChunks = {};     // "s:<dayId>" / "w:<dayId>" expanded after completion
     var expandedQueues = {};     // dayId -> true while the full episode list is shown
     var previewSel = null;       // {p, w, d} while previewing a plan day read-only from the overview
@@ -2526,13 +2604,13 @@
       var wkN = phaseWeekN();
       if (range) range.textContent = PHASE_NAMES[store.phase] + " · Week " + wkN + (wkN > 4 ? " — finishing the phase" : " of 4") + " · " + MONTH_S[first.getMonth()] + " " + first.getDate() + " – " + (last.getMonth() === first.getMonth() ? "" : MONTH_S[last.getMonth()] + " ") + last.getDate();
       strip.innerHTML = asg.map(function (a, j) {
-        var day = a.day, D = a.date;
+        var D = a.date;
         var isToday = sameDay(D, today), isPast = D < today;
         var cls = "cal-day" + (isToday ? " is-today" : "") + (j === focusIdx ? " is-sel" : "") + (isPast ? " is-past" : "");
-        var meta = !day ? "" : (day.rest ? "Rest · " + day.walkMin + "m" : day.strengthName.split("·")[0].trim() + " · " + day.walkMin + "m");
-        var dots = !day ? "" : (day.rest ? "" : '<i class="' + (strengthDone(day) ? "on-s" : "") + '"></i>') + '<i class="' + (cardioDone(day) ? "on-w" : "") + '"></i>' + '<i class="' + (lessonDone(day) ? "on-l" : "") + '"></i>';
-        var moved = day && a.nominal && day.id !== a.nominal.id;
-        return '<button class="' + cls + '" data-focus="' + j + '" aria-label="Open ' + DAYS[mon0(D)].day + " " + MONTH_S[D.getMonth()] + " " + D.getDate() + (isToday ? " (today)" : "") + (moved ? " — running " + day.day + "'s plan (" + PHASE_NAMES[day.phase] + " week " + (day.week + 1) + ")" : "") + '">' +
+        var meta = !a.cDay ? "" : (!a.sDay ? "Rest · " + a.cDay.walkMin + "m" : a.sDay.strengthName.split("·")[0].trim() + " · " + a.cDay.walkMin + "m");
+        var dots = !a.cDay ? "" : (a.sDay ? '<i class="' + (strengthDone(a.sDay) ? "on-s" : "") + '"></i>' : "") + '<i class="' + (cardioDone(a.cDay) ? "on-w" : "") + '"></i>' + '<i class="' + (lessonDone(a.lDay) ? "on-l" : "") + '"></i>';
+        var extra = !a.cDay ? "" : " — strength: " + (a.sDay ? a.sDay.strengthName + (a.sCatch ? " (catch-up from " + a.sDay.day + ")" : "") : "rest day") + " · cardio: " + a.cDay.walkMin + " min · lesson: " + a.lDay.concept + (a.lCatch ? " (catch-up from " + a.lDay.day + ")" : "");
+        return '<button class="' + cls + '" data-focus="' + j + '" aria-label="Open ' + DAYS[mon0(D)].day + " " + MONTH_S[D.getMonth()] + " " + D.getDate() + (isToday ? " (today)" : "") + extra + '">' +
           '<span class="cd-dow">' + DAYS[mon0(D)].short + '</span>' +
           '<span class="cd-num">' + D.getDate() + '</span>' +
           '<span class="cd-meta">' + meta + '</span>' +
@@ -2541,13 +2619,21 @@
       }).join("");
       var note = $("shiftNote");
       if (note) {
-        var parts = [];
+        var lShift = null, sShift = null;
         asg.forEach(function (a) {
-          if (a.date >= today && a.day && a.nominal && a.day.id !== a.nominal.id && nominalDateForPlanDay(a.day) <= a.date) {
-            parts.push(DAYS[mon0(a.date)].day + " " + MONTH_S[a.date.getMonth()] + " " + a.date.getDate() + " now runs " + a.day.day + "'s workout & lesson (" + PHASE_NAMES[a.day.phase] + " week " + (a.day.week + 1) + ")");
-          }
+          if (a.date < today || !a.cDay) return;
+          if (a.lCatch && !lShift) lShift = a;
+          if (a.sCatch && !sShift) sShift = a;
         });
-        if (parts.length) { note.hidden = false; note.innerHTML = "<strong>Plan adjusted.</strong> Unfinished days moved up: " + parts.join(" · ") + ". Anything that no longer fits this phase's four weeks simply extends the phase."; }
+        var parts = [];
+        if (lShift) parts.push("Lesson: " + lShift.lDay.day + "'s concept carried over");
+        if (sShift) parts.push("Strength: " + sShift.sDay.day + "'s session carried over");
+        if (parts.length) {
+          if (!sShift) parts.push("Workouts on schedule");
+          if (!lShift) parts.push("Lessons on schedule");
+          note.hidden = false;
+          note.innerHTML = "<strong>Plan adjusted.</strong> " + parts.join(" · ") + ". Each track catches up on its own — nothing else moves.";
+        }
         else { note.hidden = true; note.innerHTML = ""; }
       }
     }
@@ -2633,31 +2719,36 @@
       host.innerHTML = html;
     }
 
-    function dayStatusHTML(day) {
-      var complete = dayComplete(day), lDone = lessonDone(day), sDone = strengthDone(day), wDone = cardioDone(day);
+    function dayStatusHTML(view) {
+      var sDay = view.sDay, cDay = view.cDay, lDay = view.lDay;
+      var complete = viewComplete(view), lDone = lessonDone(lDay), wDone = cardioDone(cDay);
+      var sDone = !sDay || strengthDone(sDay);
       return '<div class="day-status">' +
-        (day.rest
+        (!sDay
           ? '<span class="ds-pill ok">Strength · rest day</span>'
           : '<span class="ds-pill' + (sDone ? ' ok' : '') + '">Strength ' + (sDone ? '✓ done' : '· to do') + '</span>') +
         '<span class="ds-pill' + (wDone ? ' ok' : '') + '">Cardio ' + (wDone ? '✓ done' : '· to do') + '</span>' +
         '<span class="ds-pill' + (lDone ? ' ok' : '') + '">Lesson ' + (lDone ? '✓ done' : '· to do') + '</span>' +
-        '<button class="btn mark-btn' + (complete ? ' done' : '') + '" data-markday="' + day.id + '">' + (complete ? '✓ Day done — undo' : 'Mark day done') + '</button>' +
+        '<button class="btn mark-btn' + (complete ? ' done' : '') + '" data-markday="1" data-marks="' + (sDay ? sDay.id : '') + '" data-markc="' + cDay.id + '" data-markl="' + lDay.id + '">' + (complete ? '✓ Day done — undo' : 'Mark day done') + '</button>' +
         '</div>';
     }
-    function daySectionHTML(day, headName, dateText, chipsHTML) {
-      var mod = WEEK_MODS[day.phase][day.week];
-      return '<section class="day focus' + (previewSel ? ' is-preview' : '') + '" id="day-' + day.id + '">' +
+    function daySectionHTML(view, headName, dateText, chipsHTML) {
+      var ctx = view.ctxDay, lDay = view.lDay;
+      var mod = WEEK_MODS[ctx.phase][ctx.week];
+      var sChip = view.sCatch && view.sDay ? "Catch-up · " + view.sDay.day + "'s session" : null;
+      var lChip = view.lCatch ? "Catch-up · " + lDay.day + "'s concept" : null;
+      return '<section class="day focus' + (previewSel ? ' is-preview' : '') + '" id="day-' + view.secId + '">' +
         '<div class="day-head"><h2>' + headName + '</h2>' +
         '<span class="day-date">' + dateText + '</span>' + chipsHTML +
-        '<span class="concept">Concept: <em>' + day.concept + '</em></span>' +
+        '<span class="concept">Concept: <em>' + lDay.concept + '</em></span>' +
         '<span class="db-badge">✓ Completable with dumbbells only</span>' +
-        '<span class="meta">Audio ' + day.audioTotal + '</span></div>' +
-        '<p class="week-mod"><strong>' + PHASE_NAMES[day.phase] + ' · Week ' + (day.week + 1) + ' — ' + mod.label + '.</strong> ' + mod.focus + '</p>' +
-        '<p class="wgt-tag"><strong>Wrist / ankle weights:</strong> ' + WEIGHT_TAG[day.base] + '</p>' +
-        dayStatusHTML(day) +
-        '<div class="chunks">' + strengthChunkHTML(day) + walkChunkHTML(day) + '</div>' +
-        queueHTML(day) +
-        '<div class="recall"><span class="rk">End-of-day recall — spoken when your last chunk finishes</span><p>' + day.recall + '</p></div>' +
+        '<span class="meta">Audio ' + lDay.audioTotal + '</span></div>' +
+        '<p class="week-mod"><strong>' + PHASE_NAMES[ctx.phase] + ' · Week ' + (ctx.week + 1) + ' — ' + mod.label + '.</strong> ' + mod.focus + '</p>' +
+        '<p class="wgt-tag"><strong>Wrist / ankle weights:</strong> ' + WEIGHT_TAG[(view.sDay || ctx).base] + '</p>' +
+        dayStatusHTML(view) +
+        '<div class="chunks">' + (view.sDay ? strengthChunkHTML(view.sDay, sChip) : restChunkHTML()) + walkChunkHTML(view.cDay) + '</div>' +
+        queueHTML(lDay, lChip) +
+        '<div class="recall"><span class="rk">End-of-day recall — spoken when your last chunk finishes</span><p>' + lDay.recall + '</p></div>' +
         '</section>';
     }
 
@@ -2671,41 +2762,44 @@
       if (previewSel) {
         var pd = PLAN[previewSel.p * 28 + previewSel.w * 7 + previewSel.d];
         var locked = previewSel.p !== store.phase;
+        curView = { sDay: pd.rest ? null : pd, sCatch: false, cDay: pd, lDay: pd, lCatch: false, ctxDay: pd, secId: pd.id };
         $("days").innerHTML =
           '<div class="preview-bar"><span><strong>Preview — ' + PHASE_NAMES[previewSel.p] + ' · Week ' + (previewSel.w + 1) + ' · ' + pd.day + '.</strong> ' +
           (locked ? 'This phase is locked until the current one is finished — look, but no ticking.' : 'A look ahead (or back): the live plan stays on the calendar above.') +
           '</span><button data-exitpreview="1">← Exit preview</button></div>' +
-          daySectionHTML(pd, pd.day, PHASE_NAMES[previewSel.p] + " week " + (previewSel.w + 1), '<span class="rel-chip">Preview</span>');
+          daySectionHTML(curView, pd.day, PHASE_NAMES[previewSel.p] + " week " + (previewSel.w + 1), '<span class="rel-chip">Preview</span>');
         var ctrls = $("days").querySelectorAll("input, button");
         ctrls.forEach(function (el) { if (!el.hasAttribute("data-exitpreview")) el.disabled = true; });
         updateProgress();
         return;
       }
-      var a = assignments()[focusIdx], day = a.day, today = todayDate();
+      var a = assignments()[focusIdx], today = todayDate();
+      curView = { sDay: a.sDay, sCatch: a.sCatch, cDay: a.cDay, lDay: a.lDay, lCatch: a.lCatch, ctxDay: a.nominal, secId: a.iso };
       var diff = daysBetween(today, a.date);
       var rel = diff === 0 ? '<span class="today-chip">Today</span>'
         : (diff === 1 ? '<span class="rel-chip">Tomorrow</span>'
         : (diff === -1 ? '<span class="rel-chip">Yesterday</span>' : ''));
-      var moved = a.nominal && day.id !== a.nominal.id ? '<span class="rel-chip">Catch-up · ' + day.day + "'s plan · " + PHASE_NAMES[day.phase] + " wk " + (day.week + 1) + '</span>' : '';
       var back = diff !== 0 ? '<button class="back-today" data-backtoday="1">← Back to today</button>' : '';
-      $("days").innerHTML = daySectionHTML(day, DAYS[mon0(a.date)].day, MONTH_S[a.date.getMonth()] + " " + a.date.getDate(), rel + moved + back);
+      $("days").innerHTML = daySectionHTML(curView, DAYS[mon0(a.date)].day, MONTH_S[a.date.getMonth()] + " " + a.date.getDate(), rel + back);
       updateProgress();
     }
     function updateProgress() {
       /* Every header number is derived here from the same per-portion ticks
          the day view shows, over the rolling window's tracked dates only —
-         denominators count only the days that exist in the window. */
+         denominators count only the days that exist in the window. Each
+         date contributes its own three tracks: the strength session it
+         renders (if any), its own scheduled cardio minutes, and the
+         lesson at the front of its queue. */
       var asg = assignments();
       var s = 0, w = 0, l = 0, dd = 0, sDen = 0, wDen = 0, lDen = 0;
       asg.forEach(function (a) {
-        var d = a.day;
-        if (!d) return;
-        if (!d.rest) { sDen++; if (strengthDone(d)) s++; }
-        wDen += d.walkMin;
-        if (cardioDone(d)) w += d.walkMin;
+        if (!a.cDay) return;
+        if (a.sDay) { sDen++; if (strengthDone(a.sDay)) s++; }
+        wDen += a.cDay.walkMin;
+        if (cardioDone(a.cDay)) w += a.cDay.walkMin;
         lDen++;
-        if (lessonDone(d)) l++;
-        if (dayComplete(d)) dd++;
+        if (lessonDone(a.lDay)) l++;
+        if (viewComplete(a)) dd++;
       });
       $("progDays").textContent = dd;
       $("progDaysDen").textContent = " / " + asg.length + " days";
@@ -2728,7 +2822,7 @@
       var cs = $("chunk-s-" + day.id), cw = $("chunk-w-" + day.id);
       if (cs) cs.classList.toggle("is-done", strengthDone(day));
       if (cw) cw.classList.toggle("is-done", cardioDone(day));
-      var q = document.querySelectorAll('#day-' + day.id + ' .queue li');
+      var q = document.querySelectorAll('.queue li[data-day="' + day.id + '"]');
       q.forEach(function (li, i) {
         li.classList.toggle("finished", i < st.ep);
         li.classList.toggle("playing", cur.dayId === day.id && cur.ep === i);
@@ -2924,7 +3018,7 @@
       if (embedFailedKey === epKey(cur.dayId, cur.ep)) showOpenFallback();
     }
     $("pbPlay").addEventListener("click", function () {
-      if (!cur.dayId) { ensureQueue(todayPlanDay().id, true); return; }
+      if (!cur.dayId) { var tv0 = todayView(); if (tv0.lDay) ensureQueue(tv0.lDay.id, true); return; }
       if (audio.paused) tryPlay();
       else audio.pause();
     });
@@ -2985,20 +3079,25 @@
       }
       sess.running = true;
       sess.lastTick = Date.now();
-      ensureQueue(sess.dayId, true);
       var day = dayById(sess.dayId);
+      /* whichever chunk starts, the audio that plays is the rendered view's
+         lesson queue — the tracks are decoupled, so a strength session from
+         one plan day can pair with a carried-over lesson from another */
+      var inView = curView && (sess.dayId === (curView.sDay && curView.sDay.id) || sess.dayId === curView.cDay.id || sess.dayId === curView.lDay.id);
+      var lDay = inView ? curView.lDay : day;
+      ensureQueue(lDay.id, true);
       if (sess.type === "s") {
         var segs0 = activeSegments(day);
         if (!sess.cues.start) {
           sess.cues.start = true;
-          speak(day.day + " strength: " + day.strengthName + ". Twenty minutes. " + (store.days[day.id].bb && day.bbSeg ? "Barbell version today. " : "") + "Today's concept is " + day.concept + " — the podcast runs between my cues. " + segs0[0].cue);
+          speak(day.day + " strength: " + day.strengthName + ". Twenty minutes. " + (store.days[day.id].bb && day.bbSeg ? "Barbell version today. " : "") + "Today's concept is " + lDay.concept + " — the podcast runs between my cues. " + segs0[0].cue);
           sess.segIdx = 0;
         } else if (sess.segIdx >= 0) {
           speak("Back to it. " + segs0[sess.segIdx].name + ".");
         }
       } else {
         sess.phaseIdx = 0;
-        if (!sess.cues.start) { sess.cues.start = true; speak(cardioStartCue(day)); }
+        if (!sess.cues.start) { sess.cues.start = true; speak(cardioStartCue(day, lDay.concept)); }
         else speak("Cardio resumed. " + fmtClock(sess.total - sess.elapsed) + " to go.");
       }
       sess.timer = setInterval(function () { tick(sess); }, 250);
@@ -3059,12 +3158,17 @@
       refreshDayBits(day);
       renderDays(); repaintAll();
       paintSession(sess);
-      var otherDone = sess.type === "s" ? st.wDone : (day.rest || st.sDone);
+      var inView = curView && (sess.dayId === (curView.sDay && curView.sDay.id) || sess.dayId === curView.cDay.id || sess.dayId === curView.lDay.id);
+      var otherDone = inView
+        ? (sess.type === "s" ? cardioDone(curView.cDay) : (!curView.sDay || strengthDone(curView.sDay)))
+        : (sess.type === "s" ? st.wDone : (day.rest || st.sDone));
+      var recall = inView ? curView.lDay.recall : day.recall;
+      var cardMin = inView ? curView.cDay.walkMin : day.walkMin;
       var msg = sess.type === "s" ? "Strength done. Twenty minutes, banked. " : "Cardio complete. ";
       if (otherDone) {
-        speak(msg + "That is both chunks for " + day.day + ". Time for today's recall question. " + day.recall + " Sit with that for a minute — saying it out loud is where it sticks.");
+        speak(msg + "That is both chunks for " + day.day + ". Time for today's recall question. " + recall + " Sit with that for a minute — saying it out loud is where it sticks.");
       } else {
-        speak(msg + (sess.type === "s" ? "The " + day.walkMin + "-minute cardio is still to come — the podcast picks up right where it left off." : "Strength is still to come today — the podcast picks up right where it left off."));
+        speak(msg + (sess.type === "s" ? "The " + cardMin + "-minute cardio is still to come — the podcast picks up right where it left off." : "Strength is still to come today — the podcast picks up right where it left off."));
       }
     }
     function paintSession(sess) {
@@ -3163,7 +3267,7 @@
       if (focusBtn) {
         focusIdx = parseInt(focusBtn.getAttribute("data-focus"), 10);
         renderDays(); repaintAll();
-        var fel = $("day-" + assignments()[focusIdx].day.id);
+        var fel = $("day-" + assignments()[focusIdx].iso);
         if (fel) fel.scrollIntoView();
         return;
       }
@@ -3171,7 +3275,7 @@
       if (btBtn) {
         focusIdx = todayWinIdx();
         renderDays(); repaintAll();
-        var bel = $("day-" + assignments()[focusIdx].day.id);
+        var bel = $("day-" + assignments()[focusIdx].iso);
         if (bel) bel.scrollIntoView();
         return;
       }
@@ -3219,8 +3323,17 @@
       }
       var markBtn = e.target.closest("[data-markday]");
       if (markBtn) {
-        var mDay = dayById(markBtn.getAttribute("data-markday"));
-        setDayMarked(mDay, !dayComplete(mDay));
+        var msId = markBtn.getAttribute("data-marks");
+        var mView = {
+          sDay: msId ? dayById(msId) : null,
+          cDay: dayById(markBtn.getAttribute("data-markc")),
+          lDay: dayById(markBtn.getAttribute("data-markl"))
+        };
+        var mVal = !viewComplete(mView);
+        if (mView.sDay) setChunkDone(mView.sDay, "s", mVal);
+        setChunkDone(mView.cDay, "w", mVal);
+        setLessonDone(mView.lDay, mVal);
+        save();
         renderDays(); repaintAll();
         return;
       }
@@ -3305,10 +3418,10 @@
       var t = $("coachToggle");
       t.setAttribute("aria-pressed", store.coach ? "true" : "false");
       t.textContent = store.coach ? "Coach: On" : "Coach: Off";
-      // restore today's sessions' displays + preload today's queue position (no autoplay)
+      // restore today's sessions' displays + preload today's lesson queue position (no autoplay)
       repaintAll();
-      var tId = todayPlanDay().id, tst = store.days[tId];
-      if ((tst.ep > 0 || tst.pos > 0) && dayById(tId).episodes.length) { cur.dayId = tId; loadEpisode(tId, tst.ep, false); }
+      var tView = todayView(), tId = tView.lDay ? tView.lDay.id : null, tst = tId ? store.days[tId] : null;
+      if (tst && (tst.ep > 0 || tst.pos > 0) && dayById(tId).episodes.length) { cur.dayId = tId; loadEpisode(tId, tst.ep, false); }
     })();
     </script>
   </body>
