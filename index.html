@@ -251,6 +251,23 @@
       .queue li .t a.play-link { color: var(--accent); font-size: 12.5px; font-weight: 700; }
       .queue li .t a.play-link:hover { text-decoration: underline; }
       a.pb-open { text-decoration: none; display: grid; place-content: center; width: auto; border-radius: 99px; padding: 0 14px; font-size: 13px; font-weight: 700; }
+      /* ---------- study links ---------- */
+      .study-links { margin-top: 14px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); overflow: hidden; }
+      .study-links > summary {
+        cursor: pointer; list-style: none; padding: 13px 18px; background: var(--panel-2);
+        font-family: "Barlow Condensed", sans-serif; font-size: 21px; font-weight: 700;
+      }
+      .study-links > summary::-webkit-details-marker { display: none; }
+      .study-links > summary::after { content: "+"; float: right; color: var(--accent); font-family: "Barlow", sans-serif; font-weight: 700; }
+      .study-links[open] > summary::after { content: "–"; }
+      .study-links[open] > summary { border-bottom: 1px solid var(--line); }
+      .sl-body { padding: 4px 18px 14px; }
+      .sl-group h4 { margin: 12px 0 4px; font-size: 12px; font-weight: 700; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); }
+      .sl-group ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+      .sl-group li { font-size: 15px; line-height: 1.4; }
+      .sl-group li a { font-weight: 600; }
+      .sl-chan { color: var(--muted); font-size: 13.5px; }
+
       .recall {
         margin-top: 14px; border: 1px solid var(--gold); background: var(--gold-soft);
         border-radius: 12px; padding: 14px 18px; font-size: 16.5px;
@@ -411,7 +428,7 @@
         font: inherit; font-weight: 700; font-size: 14px; cursor: pointer; margin-left: auto;
         background: var(--ink); color: var(--bg); border: 1px solid var(--ink); border-radius: 99px; padding: 7px 16px;
       }
-      .day.is-preview .chunk, .day.is-preview .queue, .day.is-preview .recall { opacity: .88; }
+      .day.is-preview .chunk, .day.is-preview .queue, .day.is-preview .study-links, .day.is-preview .recall { opacity: .88; }
       .ov-phase { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; box-shadow: var(--shadow); margin-bottom: 14px; overflow: hidden; }
       .ov-head { width: 100%; font: inherit; text-align: left; cursor: pointer; background: var(--panel-2); border: none; border-bottom: 1px solid var(--line); padding: 13px 18px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; color: var(--ink); }
       .ov-head .ov-name { font-family: "Barlow Condensed", sans-serif; font-size: 26px; font-weight: 700; text-transform: uppercase; }
@@ -2070,6 +2087,2005 @@
       ]
     };
     function qTotal(eps) { var s = 0; eps.forEach(function (e) { s += e.mins; }); return (Math.round(s * 10) / 10).toFixed(1) + " min"; }
+    var STUDY_LINKS = {
+  "B1-mon": {
+    "youtube": [
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      },
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      },
+      {
+        "course": "Grokking the System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-system-design-interview"
+      }
+    ]
+  },
+  "B1-tue": {
+    "youtube": [
+      {
+        "title": "AWS System Design Interview: High Availability, Answered Like a Senior Engineer",
+        "url": "https://www.youtube.com/watch?v=zwRNKbv9wno",
+        "channel": "—"
+      },
+      {
+        "title": "Idempotency & Retries in System Design Interviews",
+        "url": "https://www.youtube.com/watch?v=iNDHmtDxm30",
+        "channel": "System Design School"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      },
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      },
+      {
+        "course": "Grokking the System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-system-design-interview"
+      },
+      {
+        "course": "Distributed Systems: Building Software for the Real World",
+        "url": "https://www.educative.io/courses/distributed-systems-real-world"
+      }
+    ]
+  },
+  "B1-wed": {
+    "youtube": [
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Sharding in System Design Interviews w/ Meta Staff Engineer",
+        "url": "https://www.youtube.com/watch?v=L521gizea4s",
+        "channel": "HelloInterview"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      },
+      {
+        "course": "Grokking the System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-system-design-interview"
+      },
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      },
+      {
+        "course": "Advanced System Design Interview Prep: Crash Course",
+        "url": "https://www.educative.io/courses/advanced-system-design-interview-prep-crash-course"
+      }
+    ]
+  },
+  "B1-thu": {
+    "youtube": [
+      {
+        "title": "System Design Mock Interview: Design a Rate Limiter",
+        "url": "https://www.youtube.com/watch?v=SgWb6tWx3S8",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      },
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      },
+      {
+        "course": "API Design Interview Crash Course",
+        "url": "https://www.educative.io/courses/grokking-the-api-design-interview-crash-course"
+      },
+      {
+        "course": "Grokking the System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-system-design-interview"
+      }
+    ]
+  },
+  "B1-fri": {
+    "youtube": [
+      {
+        "title": "Ep 1 · Design a URL Shortener — A Full Mock System Design Interview",
+        "url": "https://www.youtube.com/watch?v=4DoYqJhXHV4",
+        "channel": "sketchthestack"
+      },
+      {
+        "title": "System Design Mock Interview: Design Instagram",
+        "url": "https://www.youtube.com/watch?v=VJpfO6KdyWE",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Autocomplete System: System Design Interview (Stripe & Amazon Offers)",
+        "url": "https://www.youtube.com/watch?v=xEHkYPV7U6Q",
+        "channel": "TechPrep"
+      },
+      {
+        "title": "System Design Interview - Design a Web Crawler",
+        "url": "https://www.youtube.com/watch?v=MAuLYRcJEr8",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      },
+      {
+        "course": "Grokking the System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-system-design-interview"
+      }
+    ]
+  },
+  "B1-sat": {
+    "youtube": [
+      {
+        "title": "System Design Mock Interview: Design a Vending Machine",
+        "url": "https://www.youtube.com/watch?v=D0kDMUgo27c",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Low-Level Design Interview: Design an Elevator w/ a Ex-Meta Staff Engineer",
+        "url": "https://www.youtube.com/watch?v=fODT0ldeBiU",
+        "channel": "HelloInterview"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Low Level Design Interview Using OOD Principles",
+        "url": "https://www.educative.io/courses/grokking-the-low-level-design-interview-using-ood-principles"
+      }
+    ]
+  },
+  "B1-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Grokking the Behavioral Interview",
+        "url": "https://www.educative.io/courses/grokking-the-behavioral-interview"
+      }
+    ]
+  },
+  "B2-mon": {
+    "youtube": [
+      {
+        "title": "System Design Interview - Design a Distributed LRU Cache",
+        "url": "https://www.youtube.com/watch?v=lZ5QuFLCVn0",
+        "channel": "Exponent"
+      },
+      {
+        "title": "How to Design a Distributed Cache (System Design)",
+        "url": "https://www.youtube.com/watch?v=tRDkIM9QeJs",
+        "channel": "The Hot Path"
+      },
+      {
+        "title": "Distributed Cache (Redis): System Design Interview (Stripe & Amazon Offers)",
+        "url": "https://www.youtube.com/watch?v=q7i31S4X8RU",
+        "channel": "TechPrep"
+      },
+      {
+        "title": "How to Design a Distributed Cache — Redis, Eviction, and Consistency",
+        "url": "https://www.youtube.com/watch?v=yZ4Pcxw9dOM",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Grokking the System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-system-design-interview"
+      },
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      },
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      }
+    ]
+  },
+  "B2-tue": {
+    "youtube": [
+      {
+        "title": "Sharding in System Design Interviews w/ Meta Staff Engineer",
+        "url": "https://www.youtube.com/watch?v=L521gizea4s",
+        "channel": "HelloInterview"
+      },
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Introduction to Distributed Systems for Dummies",
+        "url": "https://www.educative.io/courses/introduction-to-distributed-systems-for-dummies"
+      },
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      },
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      }
+    ]
+  },
+  "B2-wed": {
+    "youtube": [
+      {
+        "title": "Design a Distributed Message Queue",
+        "url": "https://www.youtube.com/watch?v=ZwwYgiT9GH0",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      },
+      {
+        "course": "Distributed Systems: Building Software for the Real World",
+        "url": "https://www.educative.io/courses/distributed-systems-real-world"
+      },
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "React Deep Dive: From Beginner to Advanced",
+        "url": "https://www.educative.io/courses/react-beginner-to-advanced"
+      }
+    ]
+  },
+  "B2-thu": {
+    "youtube": [
+      {
+        "title": "Ep 1 · Design a URL Shortener — A Full Mock System Design Interview",
+        "url": "https://www.youtube.com/watch?v=4DoYqJhXHV4",
+        "channel": "sketchthestack"
+      },
+      {
+        "title": "Can You Design Bit.ly? | System Design Interview, Animated",
+        "url": "https://www.youtube.com/watch?v=-OdgiladgSU",
+        "channel": "—"
+      },
+      {
+        "title": "Design a URL Shortener (System Design Interview)",
+        "url": "https://www.youtube.com/watch?v=9-Mz8UPXX8A",
+        "channel": "Coder Hero"
+      },
+      {
+        "title": "URL Shortener System Design, Actually Built and Load-Tested (Bitly)",
+        "url": "https://www.youtube.com/watch?v=OyONzk9LBx0",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      },
+      {
+        "course": "Grokking the Mobile System Design Interview",
+        "url": "https://www.educative.io/courses/mobile-system-design"
+      },
+      {
+        "course": "Grokking the Machine Learning System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-machine-learning-system-design-interview"
+      }
+    ]
+  },
+  "B2-fri": {
+    "youtube": [
+      {
+        "title": "Autocomplete System: System Design Interview (Stripe & Amazon Offers)",
+        "url": "https://www.youtube.com/watch?v=xEHkYPV7U6Q",
+        "channel": "TechPrep"
+      },
+      {
+        "title": "System Design Interview: How to Build Search Autocomplete",
+        "url": "https://www.youtube.com/watch?v=5vHSVXUxjq0",
+        "channel": "—"
+      },
+      {
+        "title": "Design Autocomplete: Prefix Match Is Only the Start",
+        "url": "https://www.youtube.com/watch?v=xl9xPR1fAgs",
+        "channel": "—"
+      },
+      {
+        "title": "System Design Mock Interview: Design Instagram",
+        "url": "https://www.youtube.com/watch?v=VJpfO6KdyWE",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Intermediate JavaScript: Building Frontend Components",
+        "url": "https://www.educative.io/courses/intermediate-javascript"
+      },
+      {
+        "course": "Grokking the Mobile System Design Interview",
+        "url": "https://www.educative.io/courses/mobile-system-design"
+      },
+      {
+        "course": "Grokking the Machine Learning System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-machine-learning-system-design-interview"
+      },
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      }
+    ]
+  },
+  "B2-sat": {
+    "youtube": [
+      {
+        "title": "Low-Level Design Interview: Design an Elevator w/ a Ex-Meta Staff Engineer",
+        "url": "https://www.youtube.com/watch?v=fODT0ldeBiU",
+        "channel": "HelloInterview"
+      },
+      {
+        "title": "Mock LLD Interview: Design a Movie Ticket Booking System",
+        "url": "https://www.youtube.com/watch?v=_LdUhfpQRYc",
+        "channel": "Gaurav Kabra"
+      },
+      {
+        "title": "Design a Hotel Booking Service - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=kO0EQNfE2x4",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Don't Mess Up Your Elevator System Design Interview",
+        "url": "https://www.youtube.com/watch?v=CSQlWKIeiTw",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Low Level Design Interview Using OOD Principles",
+        "url": "https://www.educative.io/courses/grokking-the-low-level-design-interview-using-ood-principles"
+      },
+      {
+        "course": "Decode the Coding Interview in JavaScript: Real-World Examples",
+        "url": "https://www.educative.io/courses/decode-coding-interview-js"
+      }
+    ]
+  },
+  "B2-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Grokking the Mobile System Design Interview",
+        "url": "https://www.educative.io/courses/mobile-system-design"
+      },
+      {
+        "course": "Introduction to JavaScript: First Steps",
+        "url": "https://www.educative.io/courses/introduction-to-javascript-first-steps"
+      },
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Decode the Coding Interview in JavaScript: Real-World Examples",
+        "url": "https://www.educative.io/courses/decode-coding-interview-js"
+      }
+    ]
+  },
+  "B3-mon": {
+    "youtube": [
+      {
+        "title": "Design a Distributed Message Queue",
+        "url": "https://www.youtube.com/watch?v=ZwwYgiT9GH0",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Grokking the Product Architecture Interview",
+        "url": "https://www.educative.io/courses/grokking-the-product-architecture-interview"
+      },
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      }
+    ]
+  },
+  "B3-tue": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Advanced System Design Interview Prep: Crash Course",
+        "url": "https://www.educative.io/courses/advanced-system-design-interview-prep-crash-course"
+      },
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      },
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      }
+    ]
+  },
+  "B3-wed": {
+    "youtube": [
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      }
+    ]
+  },
+  "B3-thu": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "API Design Interview Crash Course",
+        "url": "https://www.educative.io/courses/grokking-the-api-design-interview-crash-course"
+      },
+      {
+        "course": "Grokking the Mobile System Design Interview",
+        "url": "https://www.educative.io/courses/mobile-system-design"
+      },
+      {
+        "course": "Grokking the Product Architecture Interview",
+        "url": "https://www.educative.io/courses/grokking-the-product-architecture-interview"
+      }
+    ]
+  },
+  "B3-fri": {
+    "youtube": [
+      {
+        "title": "Video Streaming: Why Your Video Buffers - Youtube System Design Interview",
+        "url": "https://www.youtube.com/watch?v=i9RnMnX5kmQ",
+        "channel": "—"
+      },
+      {
+        "title": "Design Uber: System Design Interview Walkthrough",
+        "url": "https://www.youtube.com/watch?v=wZRPZr_A1Qs",
+        "channel": "CipherVibe"
+      },
+      {
+        "title": "9: Design Yelp/Google Places | Systems Design Interview Questions With Ex-Google SWE",
+        "url": "https://www.youtube.com/watch?v=mMSJO4SrQLI",
+        "channel": "Jordan has no life"
+      },
+      {
+        "title": "Design Ticketmaster: System Design Interview Walkthrough",
+        "url": "https://www.youtube.com/watch?v=LmU-15zpZsI",
+        "channel": "CipherVibe"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Frontend System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-frontend-system-design-interview"
+      },
+      {
+        "course": "Grokking the System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-system-design-interview"
+      },
+      {
+        "course": "Grokking the Mobile System Design Interview",
+        "url": "https://www.educative.io/courses/mobile-system-design"
+      },
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      }
+    ]
+  },
+  "B3-sat": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Java Multithreading for Senior Engineering Interviews",
+        "url": "https://www.educative.io/courses/java-multithreading-for-senior-engineering-interviews"
+      }
+    ]
+  },
+  "B3-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "AI System Design Interview Questions",
+        "url": "https://www.educative.io/courses/ai-system-design-interview-questions"
+      },
+      {
+        "course": "Distributed Systems: Building Software for the Real World",
+        "url": "https://www.educative.io/courses/distributed-systems-real-world"
+      },
+      {
+        "course": "Airbnb System Design Interview Questions",
+        "url": "https://www.educative.io/courses/airbnb-system-design-interview-questions"
+      },
+      {
+        "course": "Grokking the Product Architecture Interview",
+        "url": "https://www.educative.io/courses/grokking-the-product-architecture-interview"
+      }
+    ]
+  },
+  "B4-mon": {
+    "youtube": [
+      {
+        "title": "Facebook System Design Interview: Design Twitter",
+        "url": "https://www.youtube.com/watch?v=QF8JNSoJD8E",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Generative AI System Design",
+        "url": "https://www.educative.io/courses/generative-ai-system-design"
+      }
+    ]
+  },
+  "B4-tue": {
+    "youtube": [
+      {
+        "title": "System Design Mock Interview: Design WhatsApp",
+        "url": "https://www.youtube.com/watch?v=0iyLURrWIgQ",
+        "channel": "Exponent"
+      },
+      {
+        "title": "System Design Interview: Design WhatsApp (Animated)",
+        "url": "https://www.youtube.com/watch?v=35vtqeseIuo",
+        "channel": "Interview Arcade"
+      },
+      {
+        "title": "Design Facebook Messenger",
+        "url": "https://www.youtube.com/watch?v=uzeJb7ZjoQ4",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Design Slack: Nobody Counted Your Unread Messages — System Design Masterclass",
+        "url": "https://www.youtube.com/watch?v=C8Yn8_9bK0Q",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Adobe System Design Interview Questions",
+        "url": "https://www.educative.io/courses/adobe-system-design-interview-questions"
+      },
+      {
+        "course": "Airbnb System Design Interview Questions",
+        "url": "https://www.educative.io/courses/airbnb-system-design-interview-questions"
+      },
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      }
+    ]
+  },
+  "B4-wed": {
+    "youtube": [
+      {
+        "title": "AI Engineer System Design Interview: Design a RAG System",
+        "url": "https://www.youtube.com/watch?v=Gvqu0YXxlto",
+        "channel": "— (DataInterview)"
+      },
+      {
+        "title": "Data Engineer Mock Interview | Design a Batch Data Pipeline Bronze → Silver → Gold",
+        "url": "https://www.youtube.com/watch?v=7vzIbHCeBCg",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Machine Learning System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-machine-learning-system-design-interview"
+      }
+    ]
+  },
+  "B4-thu": {
+    "youtube": [
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      },
+      {
+        "title": "System Design Mock Interview: Design a Rate Limiter",
+        "url": "https://www.youtube.com/watch?v=SgWb6tWx3S8",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      },
+      {
+        "course": "Advanced System Design Interview Prep: Crash Course",
+        "url": "https://www.educative.io/courses/advanced-system-design-interview-prep-crash-course"
+      },
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      }
+    ]
+  },
+  "B4-fri": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Grokking the Frontend System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-frontend-system-design-interview"
+      },
+      {
+        "course": "Intermediate JavaScript: Building Frontend Components",
+        "url": "https://www.educative.io/courses/intermediate-javascript"
+      }
+    ]
+  },
+  "B4-sat": {
+    "youtube": [
+      {
+        "title": "System Design Mock Interview: Design a Vending Machine",
+        "url": "https://www.youtube.com/watch?v=D0kDMUgo27c",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Low-Level Design Interview: Design an Elevator w/ a Ex-Meta Staff Engineer",
+        "url": "https://www.youtube.com/watch?v=fODT0ldeBiU",
+        "channel": "HelloInterview"
+      },
+      {
+        "title": "Don't Mess Up Your Elevator System Design Interview",
+        "url": "https://www.youtube.com/watch?v=CSQlWKIeiTw",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      },
+      {
+        "course": "Grokking the Low Level Design Interview Using OOD Principles",
+        "url": "https://www.educative.io/courses/grokking-the-low-level-design-interview-using-ood-principles"
+      }
+    ]
+  },
+  "B4-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "AI System Design Interview Questions",
+        "url": "https://www.educative.io/courses/ai-system-design-interview-questions"
+      },
+      {
+        "course": "Grokking Coding Interview Patterns",
+        "url": "https://www.educative.io/courses/grokking-coding-interview"
+      },
+      {
+        "course": "Grokking the Frontend System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-frontend-system-design-interview"
+      },
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      }
+    ]
+  },
+  "I1-mon": {
+    "youtube": [
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "React Deep Dive: From Beginner to Advanced",
+        "url": "https://www.educative.io/courses/react-beginner-to-advanced"
+      },
+      {
+        "course": "Advanced System Design Interview Prep: Crash Course",
+        "url": "https://www.educative.io/courses/advanced-system-design-interview-prep-crash-course"
+      }
+    ]
+  },
+  "I1-tue": {
+    "youtube": [
+      {
+        "title": "Idempotency & Retries in System Design Interviews",
+        "url": "https://www.youtube.com/watch?v=iNDHmtDxm30",
+        "channel": "System Design School"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Distributed Systems: Building Software for the Real World",
+        "url": "https://www.educative.io/courses/distributed-systems-real-world"
+      }
+    ]
+  },
+  "I1-wed": {
+    "youtube": [
+      {
+        "title": "Design a Distributed Message Queue",
+        "url": "https://www.youtube.com/watch?v=ZwwYgiT9GH0",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "React Deep Dive: From Beginner to Advanced",
+        "url": "https://www.educative.io/courses/react-beginner-to-advanced"
+      },
+      {
+        "course": "Distributed Systems: Building Software for the Real World",
+        "url": "https://www.educative.io/courses/distributed-systems-real-world"
+      }
+    ]
+  },
+  "I1-thu": {
+    "youtube": [
+      {
+        "title": "System Design Interview: How to Build Search Autocomplete",
+        "url": "https://www.youtube.com/watch?v=5vHSVXUxjq0",
+        "channel": "—"
+      },
+      {
+        "title": "Autocomplete System: System Design Interview (Stripe & Amazon Offers)",
+        "url": "https://www.youtube.com/watch?v=xEHkYPV7U6Q",
+        "channel": "TechPrep"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Mobile System Design Interview",
+        "url": "https://www.educative.io/courses/mobile-system-design"
+      },
+      {
+        "course": "Grokking the Machine Learning System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-machine-learning-system-design-interview"
+      }
+    ]
+  },
+  "I1-fri": {
+    "youtube": [
+      {
+        "title": "Design a Global Cloud Storage System (OneDrive/Dropbox) — Quick Recap",
+        "url": "https://www.youtube.com/watch?v=tRgQKkqP78w",
+        "channel": "Distributed Minds"
+      },
+      {
+        "title": "Dropbox System Design Interview | File Chunking & Resumable Uploads (Ex-Amazon SDE)",
+        "url": "https://www.youtube.com/watch?v=YalpMqop-wA",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Airbnb System Design Interview Questions",
+        "url": "https://www.educative.io/courses/airbnb-system-design-interview-questions"
+      },
+      {
+        "course": "Grokking the Machine Learning System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-machine-learning-system-design-interview"
+      },
+      {
+        "course": "Grokking the Mobile System Design Interview",
+        "url": "https://www.educative.io/courses/mobile-system-design"
+      }
+    ]
+  },
+  "I1-sat": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Java Multithreading for Senior Engineering Interviews",
+        "url": "https://www.educative.io/courses/java-multithreading-for-senior-engineering-interviews"
+      },
+      {
+        "course": "Grokking the Mobile System Design Interview",
+        "url": "https://www.educative.io/courses/mobile-system-design"
+      }
+    ]
+  },
+  "I1-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Grokking the Behavioral Interview",
+        "url": "https://www.educative.io/courses/grokking-the-behavioral-interview"
+      }
+    ]
+  },
+  "I2-mon": {
+    "youtube": [
+      {
+        "title": "System Design Interview - Design a Distributed LRU Cache",
+        "url": "https://www.youtube.com/watch?v=lZ5QuFLCVn0",
+        "channel": "Exponent"
+      },
+      {
+        "title": "How to Design a Distributed Cache (System Design)",
+        "url": "https://www.youtube.com/watch?v=tRDkIM9QeJs",
+        "channel": "The Hot Path"
+      },
+      {
+        "title": "Distributed Cache (Redis): System Design Interview (Stripe & Amazon Offers)",
+        "url": "https://www.youtube.com/watch?v=q7i31S4X8RU",
+        "channel": "TechPrep"
+      },
+      {
+        "title": "How to Design a Distributed Cache — Redis, Eviction, and Consistency",
+        "url": "https://www.youtube.com/watch?v=yZ4Pcxw9dOM",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Advanced System Design Interview Prep: Crash Course",
+        "url": "https://www.educative.io/courses/advanced-system-design-interview-prep-crash-course"
+      },
+      {
+        "course": "React Deep Dive: From Beginner to Advanced",
+        "url": "https://www.educative.io/courses/react-beginner-to-advanced"
+      },
+      {
+        "course": "Introduction to Distributed Systems for Dummies",
+        "url": "https://www.educative.io/courses/introduction-to-distributed-systems-for-dummies"
+      },
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      }
+    ]
+  },
+  "I2-tue": {
+    "youtube": [
+      {
+        "title": "Data Engineer Mock Interview | Design a Batch Data Pipeline Bronze → Silver → Gold",
+        "url": "https://www.youtube.com/watch?v=7vzIbHCeBCg",
+        "channel": "—"
+      },
+      {
+        "title": "Facebook System Design Interview: Design an Analytics Platform",
+        "url": "https://www.youtube.com/watch?v=kIcq1_pBQSY",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Product Architecture Interview",
+        "url": "https://www.educative.io/courses/grokking-the-product-architecture-interview"
+      }
+    ]
+  },
+  "I2-wed": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Machine Learning System Design",
+        "url": "https://www.educative.io/courses/machine-learning-system-design"
+      },
+      {
+        "course": "Grokking the Generative AI System Design",
+        "url": "https://www.educative.io/courses/generative-ai-system-design"
+      }
+    ]
+  },
+  "I2-thu": {
+    "youtube": [
+      {
+        "title": "System Design Interview: Design Netflix",
+        "url": "https://www.youtube.com/watch?v=VvZf7lISfgs",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Design Netflix | Mock System Design Interview with Apple Software Engineer",
+        "url": "https://www.youtube.com/watch?v=vwYp31wM5UA",
+        "channel": "pkodes"
+      },
+      {
+        "title": "Video Streaming: Why Your Video Buffers - Youtube System Design Interview",
+        "url": "https://www.youtube.com/watch?v=i9RnMnX5kmQ",
+        "channel": "—"
+      },
+      {
+        "title": "Google system design interview: Design Spotify (with ex-Google EM)",
+        "url": "https://www.youtube.com/watch?v=_K-eupuDVEc",
+        "channel": "igotanoffer"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Airbnb System Design Interview Questions",
+        "url": "https://www.educative.io/courses/airbnb-system-design-interview-questions"
+      },
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      }
+    ]
+  },
+  "I2-fri": {
+    "youtube": [
+      {
+        "title": "System Design Mock Interview: Design a Rate Limiter",
+        "url": "https://www.youtube.com/watch?v=SgWb6tWx3S8",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Product Architecture Interview",
+        "url": "https://www.educative.io/courses/grokking-the-product-architecture-interview"
+      },
+      {
+        "course": "Master Agentic Design Patterns",
+        "url": "https://www.educative.io/courses/agentic-design-patterns"
+      },
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      }
+    ]
+  },
+  "I2-sat": {
+    "youtube": [
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Advanced System Design Interview Prep: Crash Course",
+        "url": "https://www.educative.io/courses/advanced-system-design-interview-prep-crash-course"
+      }
+    ]
+  },
+  "I2-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Grokking the Behavioral Interview",
+        "url": "https://www.educative.io/courses/grokking-the-behavioral-interview"
+      },
+      {
+        "course": "Distributed Systems: Building Software for the Real World",
+        "url": "https://www.educative.io/courses/distributed-systems-real-world"
+      }
+    ]
+  },
+  "I3-mon": {
+    "youtube": [
+      {
+        "title": "AWS System Design Interview: High Availability, Answered Like a Senior Engineer",
+        "url": "https://www.youtube.com/watch?v=zwRNKbv9wno",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Claude Certified Architect Foundations (CCAR-F)",
+        "url": "https://www.educative.io/courses/claude-certified-architect-foundations"
+      },
+      {
+        "course": "Grokking Coding Interview Patterns",
+        "url": "https://www.educative.io/courses/grokking-coding-interview"
+      },
+      {
+        "course": "Grokking the Frontend System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-frontend-system-design-interview"
+      },
+      {
+        "course": "Introduction to Distributed Systems for Dummies",
+        "url": "https://www.educative.io/courses/introduction-to-distributed-systems-for-dummies"
+      }
+    ]
+  },
+  "I3-tue": {
+    "youtube": [
+      {
+        "title": "Payment Fraud Detection System Design (Stripe, Visa, PayPal Interview)",
+        "url": "https://www.youtube.com/watch?v=FOIExOkoi-c",
+        "channel": "SystemDr"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Frontend System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-frontend-system-design-interview"
+      },
+      {
+        "course": "API Design Interview Crash Course",
+        "url": "https://www.educative.io/courses/grokking-the-api-design-interview-crash-course"
+      },
+      {
+        "course": "Distributed Systems: Building Software for the Real World",
+        "url": "https://www.educative.io/courses/distributed-systems-real-world"
+      },
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      }
+    ]
+  },
+  "I3-wed": {
+    "youtube": [
+      {
+        "title": "01. Proximity Service | Ace the System Design Interview with Real-World Architectures",
+        "url": "https://www.youtube.com/watch?v=e0e-I4XZnMk",
+        "channel": "—"
+      },
+      {
+        "title": "Design a Proximity Service (System Design Interview)",
+        "url": "https://www.youtube.com/watch?v=HxFUz1ycLoM",
+        "channel": "AlgoJS (@algojs)"
+      },
+      {
+        "title": "02. Designing a Real-Time Nearby Friends Feature | System Design Interview",
+        "url": "https://www.youtube.com/watch?v=Q8KA9JrApE8",
+        "channel": "—"
+      },
+      {
+        "title": "9: Design Yelp/Google Places | Systems Design Interview Questions With Ex-Google SWE",
+        "url": "https://www.youtube.com/watch?v=mMSJO4SrQLI",
+        "channel": "Jordan has no life"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-system-design-interview"
+      },
+      {
+        "course": "Grokking the Frontend System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-frontend-system-design-interview"
+      },
+      {
+        "course": "Adobe System Design Interview Questions",
+        "url": "https://www.educative.io/courses/adobe-system-design-interview-questions"
+      },
+      {
+        "course": "AI System Design Interview Questions",
+        "url": "https://www.educative.io/courses/ai-system-design-interview-questions"
+      }
+    ]
+  },
+  "I3-thu": {
+    "youtube": [
+      {
+        "title": "Design a Payment System Like Stripe — Without Charging Anyone Twice",
+        "url": "https://www.youtube.com/watch?v=cro7kZk0-EY",
+        "channel": "—"
+      },
+      {
+        "title": "11. How Payment Systems Actually Move Money | System Design Deep Dive",
+        "url": "https://www.youtube.com/watch?v=c_JVxJj0V_0",
+        "channel": "—"
+      },
+      {
+        "title": "System Design Interview: Design Amazon Kindle Payments",
+        "url": "https://www.youtube.com/watch?v=til92X5hYAY",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Payment Fraud Detection System Design (Stripe, Visa, PayPal Interview)",
+        "url": "https://www.youtube.com/watch?v=FOIExOkoi-c",
+        "channel": "SystemDr"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Airbnb System Design Interview Questions",
+        "url": "https://www.educative.io/courses/airbnb-system-design-interview-questions"
+      },
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      },
+      {
+        "course": "Adobe System Design Interview Questions",
+        "url": "https://www.educative.io/courses/adobe-system-design-interview-questions"
+      },
+      {
+        "course": "Grokking the Product Architecture Interview",
+        "url": "https://www.educative.io/courses/grokking-the-product-architecture-interview"
+      }
+    ]
+  },
+  "I3-fri": {
+    "youtube": [
+      {
+        "title": "Design Slack: Nobody Counted Your Unread Messages — System Design Masterclass",
+        "url": "https://www.youtube.com/watch?v=C8Yn8_9bK0Q",
+        "channel": "—"
+      },
+      {
+        "title": "Slack System Design: Catch Up Without Loading Everything",
+        "url": "https://www.youtube.com/watch?v=LvWuvqmn3PQ",
+        "channel": "—"
+      },
+      {
+        "title": "Design Facebook Messenger",
+        "url": "https://www.youtube.com/watch?v=uzeJb7ZjoQ4",
+        "channel": "Exponent"
+      },
+      {
+        "title": "System Design Mock Interview: Design WhatsApp",
+        "url": "https://www.youtube.com/watch?v=0iyLURrWIgQ",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      },
+      {
+        "course": "Grokking the System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-system-design-interview"
+      },
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Adobe System Design Interview Questions",
+        "url": "https://www.educative.io/courses/adobe-system-design-interview-questions"
+      }
+    ]
+  },
+  "I3-sat": {
+    "youtube": [
+      {
+        "title": "Design an LLM Inference Server for Your AI System Design Interview",
+        "url": "https://www.youtube.com/watch?v=AgjaQD8PMbc",
+        "channel": "Vibe Engines"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Generative AI System Design",
+        "url": "https://www.educative.io/courses/generative-ai-system-design"
+      },
+      {
+        "course": "Master Agentic Design Patterns",
+        "url": "https://www.educative.io/courses/agentic-design-patterns"
+      },
+      {
+        "course": "Grokking the Mobile System Design Interview",
+        "url": "https://www.educative.io/courses/mobile-system-design"
+      },
+      {
+        "course": "Grokking the Frontend System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-frontend-system-design-interview"
+      }
+    ]
+  },
+  "I3-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Grokking the Behavioral Interview",
+        "url": "https://www.educative.io/courses/grokking-the-behavioral-interview"
+      },
+      {
+        "course": "Grokking the Mobile System Design Interview",
+        "url": "https://www.educative.io/courses/mobile-system-design"
+      },
+      {
+        "course": "Advanced System Design Interview Prep: Crash Course",
+        "url": "https://www.educative.io/courses/advanced-system-design-interview-prep-crash-course"
+      }
+    ]
+  },
+  "I4-mon": {
+    "youtube": [
+      {
+        "title": "Video Streaming: Why Your Video Buffers - Youtube System Design Interview",
+        "url": "https://www.youtube.com/watch?v=i9RnMnX5kmQ",
+        "channel": "—"
+      },
+      {
+        "title": "System Design Interview: Design Netflix",
+        "url": "https://www.youtube.com/watch?v=VvZf7lISfgs",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Generative AI System Design",
+        "url": "https://www.educative.io/courses/generative-ai-system-design"
+      }
+    ]
+  },
+  "I4-tue": {
+    "youtube": [
+      {
+        "title": "Design Uber: System Design Interview Walkthrough",
+        "url": "https://www.youtube.com/watch?v=wZRPZr_A1Qs",
+        "channel": "CipherVibe"
+      },
+      {
+        "title": "Ride-Hailing Dispatch: Why the Nearest Car Is Wrong - System Design Interview",
+        "url": "https://www.youtube.com/watch?v=GjUIEqHcOUc",
+        "channel": "—"
+      },
+      {
+        "title": "System Design: Uber's Trip State Machine",
+        "url": "https://www.youtube.com/watch?v=813t1xL2s8g",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Master Agentic Design Patterns",
+        "url": "https://www.educative.io/courses/agentic-design-patterns"
+      },
+      {
+        "course": "Grokking the Generative AI System Design",
+        "url": "https://www.educative.io/courses/generative-ai-system-design"
+      }
+    ]
+  },
+  "I4-wed": {
+    "youtube": [
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Introduction to Distributed Systems for Dummies",
+        "url": "https://www.educative.io/courses/introduction-to-distributed-systems-for-dummies"
+      },
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      },
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      }
+    ]
+  },
+  "I4-thu": {
+    "youtube": [
+      {
+        "title": "System Design Interview - Design a Web Crawler",
+        "url": "https://www.youtube.com/watch?v=MAuLYRcJEr8",
+        "channel": "Exponent"
+      },
+      {
+        "title": "web crawler High level Design : part 1 | MAANG Interviews",
+        "url": "https://www.youtube.com/watch?v=vI0evNwmFyA",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Using TypeScript with React",
+        "url": "https://www.educative.io/courses/using-typescript-with-react"
+      },
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      },
+      {
+        "course": "Grokking the System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-system-design-interview"
+      },
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      }
+    ]
+  },
+  "I4-fri": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Intermediate JavaScript: Building Frontend Components",
+        "url": "https://www.educative.io/courses/intermediate-javascript"
+      },
+      {
+        "course": "Claude Certified Architect Foundations (CCAR-F)",
+        "url": "https://www.educative.io/courses/claude-certified-architect-foundations"
+      },
+      {
+        "course": "Using TypeScript with React",
+        "url": "https://www.educative.io/courses/using-typescript-with-react"
+      }
+    ]
+  },
+  "I4-sat": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Java Multithreading for Senior Engineering Interviews",
+        "url": "https://www.educative.io/courses/java-multithreading-for-senior-engineering-interviews"
+      }
+    ]
+  },
+  "I4-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Decode the Coding Interview in JavaScript: Real-World Examples",
+        "url": "https://www.educative.io/courses/decode-coding-interview-js"
+      },
+      {
+        "course": "Master the JavaScript Interview",
+        "url": "https://www.educative.io/courses/master-the-javascript-interview"
+      },
+      {
+        "course": "Grokking Coding Interview Patterns",
+        "url": "https://www.educative.io/courses/grokking-coding-interview"
+      }
+    ]
+  },
+  "A1-mon": {
+    "youtube": [
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Introduction to Distributed Systems for Dummies",
+        "url": "https://www.educative.io/courses/introduction-to-distributed-systems-for-dummies"
+      },
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      },
+      {
+        "course": "Advanced System Design Interview Prep: Crash Course",
+        "url": "https://www.educative.io/courses/advanced-system-design-interview-prep-crash-course"
+      }
+    ]
+  },
+  "A1-tue": {
+    "youtube": [
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Decode the Coding Interview in JavaScript: Real-World Examples",
+        "url": "https://www.educative.io/courses/decode-coding-interview-js"
+      },
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      }
+    ]
+  },
+  "A1-wed": {
+    "youtube": [
+      {
+        "title": "Design a Distributed Message Queue",
+        "url": "https://www.youtube.com/watch?v=ZwwYgiT9GH0",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Idempotency & Retries in System Design Interviews",
+        "url": "https://www.youtube.com/watch?v=iNDHmtDxm30",
+        "channel": "System Design School"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Introduction to Distributed Systems for Dummies",
+        "url": "https://www.educative.io/courses/introduction-to-distributed-systems-for-dummies"
+      },
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Distributed Systems: Building Software for the Real World",
+        "url": "https://www.educative.io/courses/distributed-systems-real-world"
+      }
+    ]
+  },
+  "A1-thu": {
+    "youtube": [
+      {
+        "title": "Data Engineer Mock Interview | Design a Batch Data Pipeline Bronze → Silver → Gold",
+        "url": "https://www.youtube.com/watch?v=7vzIbHCeBCg",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Using TypeScript with React",
+        "url": "https://www.educative.io/courses/using-typescript-with-react"
+      },
+      {
+        "course": "Machine Learning System Design",
+        "url": "https://www.educative.io/courses/machine-learning-system-design"
+      },
+      {
+        "course": "Grokking the Machine Learning System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-machine-learning-system-design-interview"
+      }
+    ]
+  },
+  "A1-fri": {
+    "youtube": [
+      {
+        "title": "System Design Interview: Design an Ad Click Aggregator w/ a Ex-Meta Staff Engineer",
+        "url": "https://www.youtube.com/watch?v=Zcv_899yqhI",
+        "channel": "Hello Interview"
+      },
+      {
+        "title": "11. How Payment Systems Actually Move Money | System Design Deep Dive",
+        "url": "https://www.youtube.com/watch?v=c_JVxJj0V_0",
+        "channel": "—"
+      },
+      {
+        "title": "Design a Payment System Like Stripe — Without Charging Anyone Twice",
+        "url": "https://www.youtube.com/watch?v=cro7kZk0-EY",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Product Architecture Interview",
+        "url": "https://www.educative.io/courses/grokking-the-product-architecture-interview"
+      },
+      {
+        "course": "Adobe System Design Interview Questions",
+        "url": "https://www.educative.io/courses/adobe-system-design-interview-questions"
+      },
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      }
+    ]
+  },
+  "A1-sat": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Learn Java in the Age of AI",
+        "url": "https://www.educative.io/courses/learn-java-in-the-age-of-ai"
+      },
+      {
+        "course": "Java Multithreading for Senior Engineering Interviews",
+        "url": "https://www.educative.io/courses/java-multithreading-for-senior-engineering-interviews"
+      }
+    ]
+  },
+  "A1-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Grokking the Behavioral Interview",
+        "url": "https://www.educative.io/courses/grokking-the-behavioral-interview"
+      }
+    ]
+  },
+  "A2-mon": {
+    "youtube": [
+      {
+        "title": "AWS System Design Interview: High Availability, Answered Like a Senior Engineer",
+        "url": "https://www.youtube.com/watch?v=zwRNKbv9wno",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Distributed Systems: Building Software for the Real World",
+        "url": "https://www.educative.io/courses/distributed-systems-real-world"
+      }
+    ]
+  },
+  "A2-tue": {
+    "youtube": [
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      }
+    ]
+  },
+  "A2-wed": {
+    "youtube": [
+      {
+        "title": "Facebook System Design Interview: Design an Analytics Platform",
+        "url": "https://www.youtube.com/watch?v=kIcq1_pBQSY",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "React Deep Dive: From Beginner to Advanced",
+        "url": "https://www.educative.io/courses/react-beginner-to-advanced"
+      },
+      {
+        "course": "Distributed Systems: Building Software for the Real World",
+        "url": "https://www.educative.io/courses/distributed-systems-real-world"
+      }
+    ]
+  },
+  "A2-thu": {
+    "youtube": [
+      {
+        "title": "System Design Interview - Design a Web Crawler",
+        "url": "https://www.youtube.com/watch?v=MAuLYRcJEr8",
+        "channel": "Exponent"
+      },
+      {
+        "title": "System Design Interview: How to Build Search Autocomplete",
+        "url": "https://www.youtube.com/watch?v=5vHSVXUxjq0",
+        "channel": "—"
+      },
+      {
+        "title": "Autocomplete System: System Design Interview (Stripe & Amazon Offers)",
+        "url": "https://www.youtube.com/watch?v=xEHkYPV7U6Q",
+        "channel": "TechPrep"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking Coding Interview Patterns",
+        "url": "https://www.educative.io/courses/grokking-coding-interview"
+      },
+      {
+        "course": "Master the JavaScript Interview",
+        "url": "https://www.educative.io/courses/master-the-javascript-interview"
+      },
+      {
+        "course": "Grokking the Machine Learning System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-machine-learning-system-design-interview"
+      }
+    ]
+  },
+  "A2-fri": {
+    "youtube": [
+      {
+        "title": "Design an LLM Inference Server for Your AI System Design Interview",
+        "url": "https://www.youtube.com/watch?v=AgjaQD8PMbc",
+        "channel": "Vibe Engines"
+      },
+      {
+        "title": "Design an LLM Inference Server (PagedAttention deep dive)",
+        "url": "https://www.youtube.com/watch?v=tVvPF_KW-4o",
+        "channel": "sketchthestack"
+      },
+      {
+        "title": "AI Engineer System Design Interview: Design a RAG System",
+        "url": "https://www.youtube.com/watch?v=Gvqu0YXxlto",
+        "channel": "— (DataInterview)"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Generative AI System Design",
+        "url": "https://www.educative.io/courses/generative-ai-system-design"
+      },
+      {
+        "course": "Grokking the Machine Learning System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-machine-learning-system-design-interview"
+      }
+    ]
+  },
+  "A2-sat": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Java Multithreading for Senior Engineering Interviews",
+        "url": "https://www.educative.io/courses/java-multithreading-for-senior-engineering-interviews"
+      }
+    ]
+  },
+  "A2-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Grokking the Behavioral Interview",
+        "url": "https://www.educative.io/courses/grokking-the-behavioral-interview"
+      },
+      {
+        "course": "Grokking the Machine Learning System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-machine-learning-system-design-interview"
+      }
+    ]
+  },
+  "A3-mon": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Introduction to JavaScript: First Steps",
+        "url": "https://www.educative.io/courses/introduction-to-javascript-first-steps"
+      },
+      {
+        "course": "Introduction to Distributed Systems for Dummies",
+        "url": "https://www.educative.io/courses/introduction-to-distributed-systems-for-dummies"
+      },
+      {
+        "course": "Grokking the Product Architecture Interview",
+        "url": "https://www.educative.io/courses/grokking-the-product-architecture-interview"
+      }
+    ]
+  },
+  "A3-tue": {
+    "youtube": [
+      {
+        "title": "AWS System Design Interview: High Availability, Answered Like a Senior Engineer",
+        "url": "https://www.youtube.com/watch?v=zwRNKbv9wno",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Distributed Systems: Building Software for the Real World",
+        "url": "https://www.educative.io/courses/distributed-systems-real-world"
+      }
+    ]
+  },
+  "A3-wed": {
+    "youtube": [
+      {
+        "title": "Data Engineer Mock Interview | Design a Batch Data Pipeline Bronze → Silver → Gold",
+        "url": "https://www.youtube.com/watch?v=7vzIbHCeBCg",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Decode the Coding Interview in JavaScript: Real-World Examples",
+        "url": "https://www.educative.io/courses/decode-coding-interview-js"
+      },
+      {
+        "course": "Introduction to JavaScript: First Steps",
+        "url": "https://www.educative.io/courses/introduction-to-javascript-first-steps"
+      },
+      {
+        "course": "Introduction to Distributed Systems for Dummies",
+        "url": "https://www.educative.io/courses/introduction-to-distributed-systems-for-dummies"
+      },
+      {
+        "course": "Grokking the Product Architecture Interview",
+        "url": "https://www.educative.io/courses/grokking-the-product-architecture-interview"
+      }
+    ]
+  },
+  "A3-thu": {
+    "youtube": [
+      {
+        "title": "System Design Mock Interview: Design WhatsApp",
+        "url": "https://www.youtube.com/watch?v=0iyLURrWIgQ",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Design Slack: Nobody Counted Your Unread Messages — System Design Masterclass",
+        "url": "https://www.youtube.com/watch?v=C8Yn8_9bK0Q",
+        "channel": "—"
+      },
+      {
+        "title": "Slack System Design: Catch Up Without Loading Everything",
+        "url": "https://www.youtube.com/watch?v=LvWuvqmn3PQ",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Mobile System Design Interview",
+        "url": "https://www.educative.io/courses/mobile-system-design"
+      },
+      {
+        "course": "React Deep Dive: From Beginner to Advanced",
+        "url": "https://www.educative.io/courses/react-beginner-to-advanced"
+      }
+    ]
+  },
+  "A3-fri": {
+    "youtube": [
+      {
+        "title": "System Design Interview: Design Netflix",
+        "url": "https://www.youtube.com/watch?v=VvZf7lISfgs",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Fundamentals of System Design",
+        "url": "https://www.educative.io/courses/grokking-system-design-fundamentals"
+      }
+    ]
+  },
+  "A3-sat": {
+    "youtube": [
+      {
+        "title": "System Design Mock Interview: Design a Rate Limiter",
+        "url": "https://www.youtube.com/watch?v=SgWb6tWx3S8",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Low-Level Design Interview: Design an Elevator w/ a Ex-Meta Staff Engineer",
+        "url": "https://www.youtube.com/watch?v=fODT0ldeBiU",
+        "channel": "HelloInterview"
+      },
+      {
+        "title": "System Design Mock Interview: Design a Vending Machine",
+        "url": "https://www.youtube.com/watch?v=D0kDMUgo27c",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Mock LLD Interview: Design a Movie Ticket Booking System",
+        "url": "https://www.youtube.com/watch?v=_LdUhfpQRYc",
+        "channel": "Gaurav Kabra"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Grokking the Low Level Design Interview Using OOD Principles",
+        "url": "https://www.educative.io/courses/grokking-the-low-level-design-interview-using-ood-principles"
+      }
+    ]
+  },
+  "A3-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Introduction to Distributed Systems for Dummies",
+        "url": "https://www.educative.io/courses/introduction-to-distributed-systems-for-dummies"
+      },
+      {
+        "course": "Introduction to JavaScript: First Steps",
+        "url": "https://www.educative.io/courses/introduction-to-javascript-first-steps"
+      }
+    ]
+  },
+  "A4-mon": {
+    "youtube": [
+      {
+        "title": "System Design Mock Interview: Design Instagram",
+        "url": "https://www.youtube.com/watch?v=VJpfO6KdyWE",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Facebook System Design Interview: Design Twitter",
+        "url": "https://www.youtube.com/watch?v=QF8JNSoJD8E",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Design Reddit: System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=KYExYE_9nIY",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Master Agentic Design Patterns",
+        "url": "https://www.educative.io/courses/agentic-design-patterns"
+      },
+      {
+        "course": "CSS Theming for Professionals",
+        "url": "https://www.educative.io/courses/css-theming-for-professionals"
+      },
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      },
+      {
+        "course": "Grokking the System Design Interview",
+        "url": "https://www.educative.io/courses/grokking-the-system-design-interview"
+      }
+    ]
+  },
+  "A4-tue": {
+    "youtube": [
+      {
+        "title": "System Design Interview - Design a Distributed LRU Cache",
+        "url": "https://www.youtube.com/watch?v=lZ5QuFLCVn0",
+        "channel": "Exponent"
+      },
+      {
+        "title": "How to Design a Distributed Cache (System Design)",
+        "url": "https://www.youtube.com/watch?v=tRDkIM9QeJs",
+        "channel": "The Hot Path"
+      },
+      {
+        "title": "Distributed Cache (Redis): System Design Interview (Stripe & Amazon Offers)",
+        "url": "https://www.youtube.com/watch?v=q7i31S4X8RU",
+        "channel": "TechPrep"
+      },
+      {
+        "title": "How to Design a Distributed Cache — Redis, Eviction, and Consistency",
+        "url": "https://www.youtube.com/watch?v=yZ4Pcxw9dOM",
+        "channel": "—"
+      }
+    ],
+    "educative": [
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      }
+    ]
+  },
+  "A4-wed": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Grokking Coding Interview Patterns",
+        "url": "https://www.educative.io/courses/grokking-coding-interview"
+      },
+      {
+        "course": "Decode the Coding Interview in JavaScript: Real-World Examples",
+        "url": "https://www.educative.io/courses/decode-coding-interview-js"
+      },
+      {
+        "course": "Master the JavaScript Interview",
+        "url": "https://www.educative.io/courses/master-the-javascript-interview"
+      }
+    ]
+  },
+  "A4-thu": {
+    "youtube": [
+      {
+        "title": "Ride-Hailing Dispatch: Why the Nearest Car Is Wrong - System Design Interview",
+        "url": "https://www.youtube.com/watch?v=GjUIEqHcOUc",
+        "channel": "—"
+      },
+      {
+        "title": "Design Uber: System Design Interview Walkthrough",
+        "url": "https://www.youtube.com/watch?v=wZRPZr_A1Qs",
+        "channel": "CipherVibe"
+      },
+      {
+        "title": "Design Tinder - System Design Interview",
+        "url": "https://www.youtube.com/watch?v=iyLqwyFL0Zc",
+        "channel": "Exponent"
+      },
+      {
+        "title": "Design Tinder in 45 mins | System Design Interview (HLD)",
+        "url": "https://www.youtube.com/watch?v=HQDRG-CkyIs",
+        "channel": "Mohit Chhabra Tech"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Airbnb System Design Interview Questions",
+        "url": "https://www.educative.io/courses/airbnb-system-design-interview-questions"
+      },
+      {
+        "course": "System Design Deep Dive: Real-World Distributed Systems",
+        "url": "https://www.educative.io/courses/system-design-deep-dive-real-world-distributed-systems"
+      },
+      {
+        "course": "Meta System Design Interview Questions",
+        "url": "https://www.educative.io/courses/meta-system-design-interview-questions"
+      },
+      {
+        "course": "React Deep Dive: From Beginner to Advanced",
+        "url": "https://www.educative.io/courses/react-beginner-to-advanced"
+      }
+    ]
+  },
+  "A4-fri": {
+    "youtube": [
+      {
+        "title": "Design a Key-Value Store - System Design Mock Interview",
+        "url": "https://www.youtube.com/watch?v=6fOoXT1HYxk",
+        "channel": "Exponent"
+      }
+    ],
+    "educative": [
+      {
+        "course": "Distributed Systems for Practitioners",
+        "url": "https://www.educative.io/courses/distributed-systems-practitioners"
+      }
+    ]
+  },
+  "A4-sat": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Grokking the Low Level Design Interview Using OOD Principles",
+        "url": "https://www.educative.io/courses/grokking-the-low-level-design-interview-using-ood-principles"
+      }
+    ]
+  },
+  "A4-sun": {
+    "youtube": [],
+    "educative": [
+      {
+        "course": "Decode the Coding Interview in JavaScript: Real-World Examples",
+        "url": "https://www.educative.io/courses/decode-coding-interview-js"
+      },
+      {
+        "course": "Grokking Coding Interview Patterns",
+        "url": "https://www.educative.io/courses/grokking-coding-interview"
+      }
+    ]
+  }
+};
     var PLAN = [];
     (function buildPlan() {
       for (var p = 0; p < 3; p++) {
@@ -2805,6 +4821,30 @@
           '</div>' +
         '</div></div></div>';
     }
+    /* ---------- study links (display-only; no ticks, no tracking) ---------- */
+    function escHTML(s) { return String(s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;"); }
+    function studyKey(day) { return "BIA".charAt(day.phase) + (day.week + 1) + "-" + day.base; }
+    function studyLinksHTML(day) {
+      var data = STUDY_LINKS[studyKey(day)];
+      if (!data) return "";
+      var yt = data.youtube || [], ed = data.educative || [];
+      if (!yt.length && !ed.length) return "";
+      var counts = [];
+      if (yt.length) counts.push(yt.length + (yt.length === 1 ? " video" : " videos"));
+      if (ed.length) counts.push(ed.length + (ed.length === 1 ? " course" : " courses"));
+      var h = '<details class="study-links"><summary>Study links' + (counts.length ? " · " + counts.join(" · ") : "") + '</summary><div class="sl-body">';
+      if (yt.length) {
+        h += '<div class="sl-group"><h4>Watch</h4><ul>' + yt.map(function (v) {
+          return '<li><a href="' + escHTML(v.url) + '" target="_blank" rel="noopener">' + escHTML(v.title) + '</a>' + (v.channel && v.channel !== "—" ? ' <span class="sl-chan">· ' + escHTML(v.channel) + '</span>' : '') + '</li>';
+        }).join("") + '</ul></div>';
+      }
+      if (ed.length) {
+        h += '<div class="sl-group"><h4>Read on Educative</h4><ul>' + ed.map(function (c) {
+          return '<li><a href="' + escHTML(c.url) + '" target="_blank" rel="noopener">' + escHTML(c.course) + '</a></li>';
+        }).join("") + '</ul></div>';
+      }
+      return h + '</div></details>';
+    }
     function queueProgText(day) {
       var st = store.days[day.id];
       var heard = Math.min(st.ep, day.episodes.length), total = 0, heardMin = 0;
@@ -3020,6 +5060,7 @@
         dayStatusHTML(view) +
         '<div class="chunks">' + (view.sDay ? strengthChunkHTML(view.sDay, sChip) : restChunkHTML()) + walkChunkHTML(view.cDay) + '</div>' +
         queueHTML(lDay, lChip) +
+        studyLinksHTML(lDay) +
         '<div class="recall"><span class="rk">End-of-day recall — spoken when your last chunk finishes</span><p>' + lDay.recall + '</p></div>' +
         '</section>';
     }
