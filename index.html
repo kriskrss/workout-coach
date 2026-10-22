@@ -486,6 +486,20 @@
         border-radius: 99px; padding: 9px 16px;
       }
       .reset-btn.armed { background: var(--accent); border-color: var(--accent); color: #fff; }
+      .reset-btn[hidden] { display: none; }
+      .catch-note { margin: 2px 0 12px; padding: 10px 12px; background: var(--gold-soft); border: 1px solid var(--gold); border-radius: 10px; }
+      .catch-why { margin: 0 0 8px; font-size: 14px; line-height: 1.45; }
+      .catch-done-btn { font-size: 13.5px; }
+      .prog-io { margin-top: 18px; border-top: 1px solid var(--line); padding-top: 14px; }
+      .prog-io-h { margin: 0 0 6px; font-size: 16px; }
+      .prog-code {
+        width: 100%; box-sizing: border-box; font: 12px/1.5 ui-monospace, SFMono-Regular, Menlo, monospace;
+        color: var(--ink); background: var(--panel-2); border: 1px solid var(--line); border-radius: 10px;
+        padding: 9px 11px; margin: 0 0 10px; resize: vertical;
+      }
+      .io-file-input { position: absolute; width: 1px; height: 1px; opacity: 0; overflow: hidden; }
+      .io-msg { font-weight: 600; }
+      .io-msg.ok { color: var(--walk); }
       .reset-note { margin: 0 0 10px; font-size: 14px; color: var(--muted); }
       .reset-note code { font-size: 12.5px; background: var(--panel-2); border: 1px solid var(--line); border-radius: 5px; padding: 1px 5px; white-space: nowrap; }
       /* ---------- brand logo ---------- */
@@ -642,6 +656,21 @@
             <button class="reset-btn" data-resetact="all" data-label="Reset everything">Reset everything</button>
           </div>
           <p class="reset-note">The same resets can be triggered by adding a reset option to the page address: <code>?reset=today</code>, <code>?reset=today-lesson</code>, <code>?reset=day:2026-10-18</code> (append <code>:lesson</code>, <code>:strength</code> or <code>:cardio</code> to clear one part of that day), <code>?reset=week</code>, or <code>?reset=all</code>. The option is applied once, on load, then removed from the address.</p>
+          <div class="prog-io">
+            <h3 class="prog-io-h">Move progress to another copy</h3>
+            <p class="reset-note">Each copy of this app (Safari, the Home Screen icon) keeps its own progress on this device. Export copies everything stored here — every tick, phase progress and day assignment — as a JSON file and a text code. Importing that code or file into another copy replaces that copy's progress with this one, so nothing is lost in the move.</p>
+            <div class="reset-grid">
+              <button class="reset-btn" id="exportBtn" type="button">Export progress</button>
+              <button class="reset-btn" id="copyCodeBtn" type="button" hidden>Copy code</button>
+              <label class="reset-btn" for="importFile">Import from file…</label>
+              <input class="io-file-input" type="file" id="importFile" accept=".json,application/json,text/plain" />
+            </div>
+            <textarea id="progressCode" class="prog-code" rows="4" spellcheck="false" placeholder="Export fills this box with your progress code. To import, paste a code here (or choose a file above), then tap Import progress."></textarea>
+            <div class="reset-grid">
+              <button class="reset-btn" id="importBtn" type="button" data-label="Import progress">Import progress</button>
+            </div>
+            <p class="reset-note io-msg" id="ioMsg" hidden></p>
+          </div>
         </div>
       </details>
 
@@ -4181,9 +4210,12 @@
         if (!Array.isArray(st.sBlocks)) st.sBlocks = [];
         if (!Array.isArray(st.wBlocks)) st.wBlocks = [];
         if (typeof st.lDone !== "boolean") st.lDone = false;
-        /* stores saved before per-block ticks tracked everything: if a chunk
-           was marked done, its block ticks count as fully ticked */
-        if (st.sDone && !st.sBlocks.length && d.blocks.length) st.sBlocks = d.blocks.map(function () { return true; });
+        /* a stored sDone flag means the session was completed (mark-done
+           control or a finished session timer), even if its block ticks were
+           never all recorded: backfill the ticks to all-true so the queue,
+           the day pills, the metrics and the phase gate — which all read the
+           ticks — agree that the day is complete */
+        if (st.sDone && d.blocks.length) st.sBlocks = d.blocks.map(function () { return true; });
         if (st.wDone && !st.wBlocks.length) { var cb = cardioBlocks(d); if (cb.length) st.wBlocks = cb.map(function () { return true; }); }
       });
     }
@@ -4254,11 +4286,17 @@
       var st = store.days[day.id];
       return day.episodes.length ? st.ep >= day.episodes.length : !!st.lDone;
     }
-    /* Done state is always DERIVED from the per-portion ticks — never read
-       from a stored "done" flag — so the header counters, the calendar dots,
-       the day pills and the phase gate all read the same ticks the day view
-       shows, and unticking any single portion updates every one of them. */
-    function strengthDone(day) { return day.rest ? true : blocksAll(day, "s"); }
+    /* Strength done state is derived from the per-portion ticks OR the
+       stored sDone flag: a day whose session was marked complete counts as
+       complete even if some block ticks are missing, and the load-time
+       migration in initDayDefaults backfills such a day's ticks to
+       all-true, so the header counters, the calendar dots, the day pills
+       and the phase gate all read the same state the day view shows. */
+    function strengthDone(day) {
+      if (day.rest) return true;
+      var st = store.days[day.id];
+      return (st && !!st.sDone) || blocksAll(day, "s");
+    }
     function cardioDone(day) { return blocksAll(day, "w"); }
     /* =============== ROLLING 7-DAY WINDOW ===============
        The tracker frames a rolling window of 7 consecutive dates — 3 days
@@ -4354,6 +4392,7 @@
       var S = phaseStartDate(p), today = todayDate();
       var sq = trackQueue(p, "s"), lq = trackQueue(p, "l");
       var todayPin = pinFor(dateISO(today), p);
+      if (pinStale(todayPin)) todayPin = null;   // pinned session already complete — drain from live ticks instead
       var assumedS = {}, assumedL = {}, sFront = null, lFront = null, d = new Date(S.getTime());
       while (d <= D) {
         sFront = null; lFront = null;
@@ -4375,12 +4414,18 @@
       if (lFront) { comp.lDay = lFront.day; comp.lCatch = lFront.day.id !== nom.id; }
       return comp;
     }
+    /* a stored pin is stale when the strength session it pins is already
+       fully complete (all block ticks, or the sDone flag): serving it would
+       front a finished session, so the date is recomputed from live ticks
+       instead and the fresh resolution replaces the pin */
+    function pinStale(pin) { return !!(pin && pin.s && strengthDone(pin.s)); }
     function resolveDate(D) {
       var iso = dateISO(D), nom = nominalPlanDay(D), today = todayDate();
       var comp = { date: D, iso: iso, nominal: nom, sDay: null, sCatch: false, cDay: nom, lDay: nom, lCatch: false };
       if (!nom) return comp;
       if (D <= today) {
         var pin = pinFor(iso, phaseForDate(D));
+        if (pinStale(pin)) pin = null;
         if (pin) {
           comp.lDay = pin.l; comp.lCatch = pin.l.id !== nom.id;
           comp.sDay = pin.s || (nom.rest ? null : nom);
@@ -4601,6 +4646,121 @@
       }, 4000);
     }
 
+    /* =============== PROGRESS EXPORT / IMPORT ===============
+       Progress lives only in this copy's local storage, so moving between
+       copies (Safari ↔ Home Screen) goes through an explicit hand-off:
+       Export downloads the complete stored payload as a JSON file and also
+       shows it as a copyable text code; Import takes a pasted code or a
+       chosen file, validates it as a progress payload, asks for an
+       explicit confirming tap, then replaces the stored payload wholesale
+       and reloads so every derivation reads the imported state. Invalid
+       data is rejected with a message and no state change. */
+    function ioMsg(text, ok) {
+      var m = $("ioMsg");
+      if (m) { m.textContent = text; m.hidden = false; m.classList.toggle("ok", !!ok); }
+      showToast(text);
+    }
+    function exportProgressText() {
+      var raw = null;
+      try { raw = localStorage.getItem(LS_KEY); } catch (e) {}
+      if (raw) { try { return JSON.stringify(JSON.parse(raw), null, 2); } catch (e) {} }
+      return JSON.stringify(store, null, 2);
+    }
+    function parseProgressImport(text) {
+      var obj = null;
+      try { obj = JSON.parse(String(text || "").trim()); } catch (e) { return null; }
+      if (!obj || typeof obj !== "object" || Array.isArray(obj)) return null;
+      if (!obj.days || typeof obj.days !== "object" || Array.isArray(obj.days)) return null;
+      /* a genuine export always carries the phase + assignment state
+         alongside the day ticks — anything missing them is not a progress
+         payload (a bare {"days":{}} must never wipe a copy's progress) */
+      if (typeof obj.phase !== "number") return null;
+      if (!obj.calAssign || typeof obj.calAssign !== "object" || Array.isArray(obj.calAssign)) return null;
+      return obj;
+    }
+    var stagedImport = null, importArmed = false, importArmTimer = null;
+    function disarmImport() {
+      importArmed = false;
+      var b = $("importBtn");
+      if (b) { b.classList.remove("armed"); b.textContent = b.getAttribute("data-label"); }
+      if (importArmTimer) { clearTimeout(importArmTimer); importArmTimer = null; }
+    }
+    function armImport() {
+      importArmed = true;
+      var b = $("importBtn");
+      if (b) { b.classList.add("armed"); b.textContent = "Tap again to replace this copy's progress"; }
+      if (importArmTimer) clearTimeout(importArmTimer);
+      importArmTimer = setTimeout(disarmImport, 6000);
+    }
+    function stageImportText(text, sourceLabel) {
+      var obj = parseProgressImport(text);
+      if (!obj) {
+        stagedImport = null; disarmImport();
+        ioMsg("That " + sourceLabel + " isn't valid progress data — nothing was imported and nothing changed.", false);
+        return false;
+      }
+      stagedImport = obj;
+      ioMsg("Progress " + sourceLabel + " looks valid. Tap “Import progress” again to replace this copy's stored progress with it.", true);
+      armImport();
+      return true;
+    }
+    (function wireProgressIO() {
+      var exBtn = $("exportBtn"), cpBtn = $("copyCodeBtn"), imBtn = $("importBtn"),
+          ta = $("progressCode"), fi = $("importFile");
+      if (!exBtn || !imBtn || !ta) return;
+      exBtn.addEventListener("click", function () {
+        var text = exportProgressText();
+        ta.value = text;
+        if (cpBtn) cpBtn.hidden = false;
+        try {
+          var blob = new Blob([text], { type: "application/json" });
+          var url = URL.createObjectURL(blob);
+          var a = document.createElement("a");
+          a.href = url; a.download = "workout-progress.json";
+          document.body.appendChild(a); a.click();
+          setTimeout(function () { try { URL.revokeObjectURL(url); a.remove(); } catch (e) {} }, 500);
+        } catch (e) {}
+        ioMsg("Progress exported — the JSON file is downloading and the same code is in the box, ready to copy.", true);
+      });
+      if (cpBtn) cpBtn.addEventListener("click", function () {
+        if (!ta.value) return;
+        ta.focus(); ta.select();
+        function done() { ioMsg("Progress code copied.", true); }
+        function fallback() {
+          var ok = false;
+          try { ok = document.execCommand("copy"); } catch (e) {}
+          ioMsg(ok ? "Progress code copied." : "The code is selected in the box — copy it now.", ok);
+        }
+        if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(ta.value).then(done, fallback);
+        else fallback();
+      });
+      ta.addEventListener("input", function () { stagedImport = null; disarmImport(); });
+      if (fi) fi.addEventListener("change", function () {
+        var f = fi.files && fi.files[0];
+        if (!f) return;
+        var rd = new FileReader();
+        rd.onload = function () {
+          ta.value = String(rd.result || "");
+          stageImportText(ta.value, "file");
+          fi.value = "";
+        };
+        rd.onerror = function () { ioMsg("That file couldn't be read — nothing was imported and nothing changed.", false); fi.value = ""; };
+        rd.readAsText(f);
+      });
+      imBtn.addEventListener("click", function () {
+        if (importArmed && stagedImport) {
+          var payload = JSON.stringify(stagedImport);
+          stagedImport = null; disarmImport();
+          try { localStorage.setItem(LS_KEY, payload); }
+          catch (e) { ioMsg("This copy refused the imported progress — nothing changed.", false); return; }
+          showToast("Progress imported — reloading with the imported ticks.");
+          setTimeout(function () { window.location.reload(); }, 350);
+          return;
+        }
+        stageImportText(ta.value, "code");
+      });
+    })();
+
     /* =============== EXERCISE ROWS ===============
        Each strength block's exercises render as glanceable rows — an
        animated figure thumbnail (when assets exist), the exercise name,
@@ -4770,8 +4930,17 @@
       var completeS = strengthDone(day);
       var sessS = sessions[day.id] && sessions[day.id].strength;
       var collapsedS = completeS && !(sessS && sessS.running) && !expandedChunks["s:" + day.id];
+      /* a catch-up card says WHY this earlier session is fronting the queue
+         (how many of its blocks are ticked) and offers a one-tap clear for
+         a session that was done but never fully ticked off */
+      var tickedS = st.sBlocks.filter(Boolean).length;
+      var catchNote = (catchText && !completeS)
+        ? '<div class="catch-note"><p class="catch-why">' + day.day + "'s session is back because " + tickedS + " of " + day.blocks.length + " blocks are ticked — the strength queue serves the oldest unfinished session first.</p>" +
+          '<button class="btn catch-done-btn" data-catchdone="' + day.id + '">I already did this — mark session complete</button></div>'
+        : '';
       return '<div class="chunk' + (completeS ? ' is-done' : '') + (collapsedS ? ' is-collapsed' : '') + '" id="chunk-s-' + day.id + '">' +
         '<div class="chunk-top"><span class="chunk-tag tag-s">Strength</span><h3>' + day.strengthName + '</h3>' + (catchText ? '<span class="catch-chip">' + catchText + '</span>' : '') + '<span class="mins">20 min</span></div>' +
+        catchNote +
         (collapsedS ? '<button class="chunk-expand" data-expandchunk="s" data-day="' + day.id + '">✓ Done — all ' + day.blocks.length + ' blocks ticked · tap to show the full session</button>' : '') +
         '<div class="chunk-body">' +
         bbRow +
@@ -5736,6 +5905,19 @@
         setLessonDone(mView.lDay, mVal);
         save();
         renderDays(); repaintAll();
+        return;
+      }
+      var cdBtn = e.target.closest("[data-catchdone]");
+      if (cdBtn) {
+        var cdDay = dayById(cdBtn.getAttribute("data-catchdone"));
+        if (cdDay) {
+          /* same effect as the strength chunk's mark-done: every block
+             ticked and the done flag set, so the queue advances past this
+             session on the re-render */
+          setChunkDone(cdDay, "s", true);
+          renderDays(); repaintAll();
+          showToast(cdDay.day + "'s session marked complete — the queue has moved on to the next session.");
+        }
         return;
       }
       var exRowBtn = e.target.closest("[data-exrow]");
