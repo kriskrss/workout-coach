@@ -188,10 +188,12 @@
         padding: 16px 18px 18px; box-shadow: var(--shadow); display: flex; flex-direction: column; gap: 10px;
       }
       .chunk.rest { background: var(--panel-2); box-shadow: none; justify-content: center; }
+      .chunk.fullrest { grid-column: 1 / -1; }
       .chunk-top { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
       .chunk-tag { font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; padding: 4px 10px; border-radius: 5px; }
       .tag-s { background: var(--accent-soft); color: var(--accent); }
       .tag-w { background: var(--walk-soft); color: var(--walk); }
+      .tag-fr { background: var(--gold-soft); color: var(--gold); }
       .chunk-top h3 { margin: 0; font-size: 23px; font-weight: 700; }
       .chunk-top .mins { margin-left: auto; font-family: "Barlow Condensed", sans-serif; font-size: 21px; font-weight: 600; color: var(--muted); white-space: nowrap; }
       .chunk .note { font-size: 14px; color: var(--muted); margin: 0; }
@@ -357,6 +359,8 @@
       }
       .ds-pill.ok { background: var(--walk-soft); border-color: var(--walk); color: var(--walk); }
       .mark-btn { margin-left: auto; background: var(--ink); color: var(--bg); border: 1px solid var(--ink); padding: 8px 18px; font-size: 14px; }
+      .fr-btn { background: var(--panel-2); color: var(--ink); border: 1px solid var(--gold); padding: 8px 16px; font-size: 14px; }
+      .fr-btn.on { background: var(--gold-soft); border-color: var(--gold); font-weight: 700; }
       .mark-btn.done { background: var(--walk); border-color: var(--walk); color: #fff; }
       .blk-tick { display: flex; gap: 9px; align-items: flex-start; cursor: pointer; }
       .blk-tick input {
@@ -4185,6 +4189,12 @@
     if (!store.phaseStart) store.phaseStart = START_ISO;
     if (typeof store.maintRounds !== "number") store.maintRounds = 0;
     if (!store.calAssign) store.calAssign = {};
+    /* floating full-rest marks: ISO date -> true, at most one per
+       Sunday–Saturday week. A per-date overlay on the unchanged week
+       templates — a marked date serves no strength session (the queue
+       skips it) and no cardio at all; its lesson is unaffected. Stored
+       in the same payload, so export/import carries the marks. */
+    if (!store.fullRest || typeof store.fullRest !== "object" || Array.isArray(store.fullRest)) store.fullRest = {};
     if (!store.phaseStarts || typeof store.phaseStarts !== "object") store.phaseStarts = {};
     if (store.phase === 0) store.phaseStart = START_ISO;   // phase 0 begins on the tracker start date
     store.phaseStarts[0] = START_ISO;
@@ -4316,6 +4326,30 @@
     function daysBetween(a, b) { return Math.round((b - a) / 86400000); }
     function sameDay(a, b) { return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate(); }
     function mon0(d) { var js = d.getDay(); return js === 0 ? 6 : js - 1; }   // Mon=0..Sun=6
+    /* =============== FLOATING FULL REST ===============
+       One full-rest date per Sunday–Saturday week, chosen week by week.
+       Marking a second date in the same week moves the mark (the earlier
+       date reverts to its normal template); un-marking hands the date
+       back with no penalty. The marks live in store.fullRest. */
+    function isFullRest(iso) { return !!(store.fullRest && store.fullRest[iso]); }
+    function sundayOf(D) { return addDays(D, -D.getDay()); }   // weeks run Sunday–Saturday
+    function fullRestInWeek(iso) {
+      var target = dateISO(sundayOf(parseISO(iso)));
+      var keys = Object.keys(store.fullRest || {});
+      for (var i = 0; i < keys.length; i++) {
+        if (dateISO(sundayOf(parseISO(keys[i]))) === target) return keys[i];
+      }
+      return null;
+    }
+    function toggleFullRest(iso) {
+      if (store.fullRest[iso]) { delete store.fullRest[iso]; save(); return { on: false, movedFrom: null }; }
+      var other = fullRestInWeek(iso);
+      if (other && other !== iso) delete store.fullRest[other];
+      store.fullRest[iso] = true;
+      save();
+      return { on: true, movedFrom: (other && other !== iso) ? other : null };
+    }
+    function frLabel(iso) { var D = parseISO(iso); return DAYS[mon0(D)].day + " " + fmtDateShort(D); }
     function parseISO(s) { var p = String(s || "").split("-"); return new Date(+p[0], (+p[1] || 1) - 1, +p[2] || 1); }
     function phaseStartISO(p) {
       if (p === 0) return START_ISO;
@@ -4359,6 +4393,10 @@
        · CARDIO: every date renders its own scheduled cardio (40 min, or
          60 on scheduled rest days). Missed cardio is forgiven — it does
          not roll, stack, or shift anything.
+       · FULL REST: a date marked as the week's floating full-rest day is
+         skipped by the strength queue entirely (the front session waits
+         for the next date) and runs no cardio at all — it is never
+         counted as missed. The lesson track ignores the mark.
        Ticks stay keyed to the plan day that owns each portion, so phase
        portions, gating and stats are exactly as before — only the
        scheduling/presentation is decoupled. */
@@ -4387,7 +4425,7 @@
          assumed finished that day, so later dates project the next item
          in that track's queue. */
       var p = phaseForDate(D), nom = nominalPlanDay(D);
-      var comp = { date: D, iso: dateISO(D), nominal: nom, sDay: null, sCatch: false, cDay: nom, lDay: nom, lCatch: false };
+      var comp = { date: D, iso: dateISO(D), nominal: nom, sDay: null, sCatch: false, cDay: nom, lDay: nom, lCatch: false, fullRest: isFullRest(dateISO(D)) };
       if (p < 0 || !nom) return comp;
       var S = phaseStartDate(p), today = todayDate();
       var sq = trackQueue(p, "s"), lq = trackQueue(p, "l");
@@ -4405,12 +4443,13 @@
           sFront = todayPin.s ? { day: todayPin.s } : null;
           lFront = { day: todayPin.l };
         }
+        if (isFullRest(dateISO(d))) sFront = null;   // a full-rest date serves no session and finishes none — the front waits for the next date
         if (sameDay(d, D)) break;
         if (d >= today) { if (sFront) assumedS[sFront.day.id] = 1; if (lFront) assumedL[lFront.day.id] = 1; }
         d = addDays(d, 1);
       }
       if (sFront) { comp.sDay = sFront.day; comp.sCatch = nom.rest || sFront.day.id !== nom.id; }
-      else if (!nom.rest) comp.sDay = nom;   // every session up to here is ticked — the date's own, complete
+      else if (!nom.rest && !comp.fullRest) comp.sDay = nom;   // every session up to here is ticked — the date's own, complete
       if (lFront) { comp.lDay = lFront.day; comp.lCatch = lFront.day.id !== nom.id; }
       return comp;
     }
@@ -4421,15 +4460,19 @@
     function pinStale(pin) { return !!(pin && pin.s && strengthDone(pin.s)); }
     function resolveDate(D) {
       var iso = dateISO(D), nom = nominalPlanDay(D), today = todayDate();
-      var comp = { date: D, iso: iso, nominal: nom, sDay: null, sCatch: false, cDay: nom, lDay: nom, lCatch: false };
+      var fr = isFullRest(iso);
+      var comp = { date: D, iso: iso, nominal: nom, sDay: null, sCatch: false, cDay: nom, lDay: nom, lCatch: false, fullRest: fr };
       if (!nom) return comp;
       if (D <= today) {
         var pin = pinFor(iso, phaseForDate(D));
         if (pinStale(pin)) pin = null;
         if (pin) {
           comp.lDay = pin.l; comp.lCatch = pin.l.id !== nom.id;
-          comp.sDay = pin.s || (nom.rest ? null : nom);
-          comp.sCatch = !!pin.s && (nom.rest || pin.s.id !== nom.id);
+          if (fr) { comp.sDay = null; comp.sCatch = false; }   // full rest overrides the pinned session; the lesson pin still applies
+          else {
+            comp.sDay = pin.s || (nom.rest ? null : nom);
+            comp.sCatch = !!pin.s && (nom.rest || pin.s.id !== nom.id);
+          }
           return comp;
         }
       }
@@ -4452,6 +4495,9 @@
        the strength session it rendered (if any), its own cardio, and the
        lesson at the front of its queue */
     function viewComplete(v) {
+      /* a full-rest date has no strength or cardio portions at all — only
+         its lesson stands between it and a complete day */
+      if (v.fullRest) return !!v.lDay && lessonDone(v.lDay);
       return !!v.cDay && (!v.sDay || strengthDone(v.sDay)) && cardioDone(v.cDay) && lessonDone(v.lDay);
     }
 
@@ -4540,6 +4586,7 @@
         store.phaseStarts = { "0": START_ISO };
         store.maintRounds = 0;
         store.calAssign = {};
+        store.fullRest = {};
         initDayDefaults();
         sessions = {};
         try { audio.pause(); audio.removeAttribute("src"); audio.load(); } catch (e) {}
@@ -4916,6 +4963,12 @@
         '<p class="note">No strength today — recovery is part of the plan. The cardio stretches to a full 60 minutes, and the podcast queue still runs: one concept, gone deep, at an easy pace.</p>' +
         '</div>';
     }
+    function fullRestChunkHTML() {
+      return '<div class="chunk rest fullrest">' +
+        '<div class="chunk-top"><span class="chunk-tag tag-fr">Full rest</span><h3>Full rest day</h3></div>' +
+        '<p class="note">No strength and no cardio today — complete recovery, and nothing is owed for it: today\'s cardio is not missed, it is simply off. The strength session that would have run today moves to the next day. The podcast lesson below still runs as usual — listening is not training.</p>' +
+        '</div>';
+    }
     function strengthChunkHTML(day, catchText) {
       var st = store.days[day.id];
       if (day.rest) return restChunkHTML();
@@ -5087,9 +5140,13 @@
         var D = a.date;
         var isToday = sameDay(D, today), isPast = D < today;
         var cls = "cal-day" + (isToday ? " is-today" : "") + (j === focusIdx ? " is-sel" : "") + (isPast ? " is-past" : "");
-        var meta = !a.cDay ? "" : (!a.sDay ? "Rest · " + a.cDay.walkMin + "m" : a.sDay.strengthName.split("·")[0].trim() + " · " + a.cDay.walkMin + "m");
-        var dots = !a.cDay ? "" : (a.sDay ? '<i class="' + (strengthDone(a.sDay) ? "on-s" : "") + '"></i>' : "") + '<i class="' + (cardioDone(a.cDay) ? "on-w" : "") + '"></i>' + '<i class="' + (lessonDone(a.lDay) ? "on-l" : "") + '"></i>';
-        var extra = !a.cDay ? "" : " — strength: " + (a.sDay ? a.sDay.strengthName + (a.sCatch ? " (catch-up from " + a.sDay.day + ")" : "") : "rest day") + " · cardio: " + a.cDay.walkMin + " min · lesson: " + a.lDay.concept + (a.lCatch ? " (catch-up from " + a.lDay.day + ")" : "");
+        var meta = a.fullRest ? "Full rest" : (!a.cDay ? "" : (!a.sDay ? "Rest · " + a.cDay.walkMin + "m" : a.sDay.strengthName.split("·")[0].trim() + " · " + a.cDay.walkMin + "m"));
+        var dots = !a.cDay ? "" : (a.fullRest
+          ? '<i class="' + (lessonDone(a.lDay) ? "on-l" : "") + '"></i>'
+          : (a.sDay ? '<i class="' + (strengthDone(a.sDay) ? "on-s" : "") + '"></i>' : "") + '<i class="' + (cardioDone(a.cDay) ? "on-w" : "") + '"></i>' + '<i class="' + (lessonDone(a.lDay) ? "on-l" : "") + '"></i>');
+        var extra = a.fullRest
+          ? " — full rest day: no strength, no cardio · lesson: " + a.lDay.concept + (a.lCatch ? " (catch-up from " + a.lDay.day + ")" : "")
+          : (!a.cDay ? "" : " — strength: " + (a.sDay ? a.sDay.strengthName + (a.sCatch ? " (catch-up from " + a.sDay.day + ")" : "") : "rest day") + " · cardio: " + a.cDay.walkMin + " min · lesson: " + a.lDay.concept + (a.lCatch ? " (catch-up from " + a.lDay.day + ")" : ""));
         return '<button class="' + cls + '" data-focus="' + j + '" aria-label="Open ' + DAYS[mon0(D)].day + " " + MONTH_S[D.getMonth()] + " " + D.getDate() + (isToday ? " (today)" : "") + extra + '">' +
           '<span class="cd-dow">' + DAYS[mon0(D)].short + '</span>' +
           '<span class="cd-num">' + D.getDate() + '</span>' +
@@ -5201,7 +5258,31 @@
 
     function dayStatusHTML(view) {
       var sDay = view.sDay, cDay = view.cDay, lDay = view.lDay;
-      var complete = viewComplete(view), lDone = lessonDone(lDay), wDone = cardioDone(cDay);
+      var complete = viewComplete(view), lDone = lessonDone(lDay);
+      /* the full-rest toggle lives in the status row for the viewed date.
+         When another date in the same Sun–Sat week already holds the
+         mark, the button says so up front — tapping moves the full-rest
+         day here and returns that date to its normal plan. */
+      var frBtn = "";
+      if (view.iso) {
+        if (view.fullRest) {
+          frBtn = '<button class="btn fr-btn on" data-fullrest="' + view.iso + '">Full rest day ✓ — tap to undo</button>';
+        } else {
+          var otherFR = fullRestInWeek(view.iso);
+          frBtn = '<button class="btn fr-btn" data-fullrest="' + view.iso + '">' +
+            (otherFR ? "Make this the week's full-rest day — moves it from " + frLabel(otherFR) : "Mark as full-rest day") + '</button>';
+        }
+      }
+      if (view.fullRest) {
+        return '<div class="day-status">' +
+          '<span class="ds-pill ok">Strength · full rest</span>' +
+          '<span class="ds-pill ok">Cardio · full rest</span>' +
+          '<span class="ds-pill' + (lDone ? ' ok' : '') + '">Lesson ' + (lDone ? '✓ done' : '· to do') + '</span>' +
+          frBtn +
+          '<button class="btn mark-btn' + (complete ? ' done' : '') + '" data-markday="1" data-markfr="1" data-markl="' + lDay.id + '">' + (complete ? '✓ Day done — undo' : 'Mark day done') + '</button>' +
+          '</div>';
+      }
+      var wDone = cardioDone(cDay);
       var sDone = !sDay || strengthDone(sDay);
       return '<div class="day-status">' +
         (!sDay
@@ -5209,6 +5290,7 @@
           : '<span class="ds-pill' + (sDone ? ' ok' : '') + '">Strength ' + (sDone ? '✓ done' : '· to do') + '</span>') +
         '<span class="ds-pill' + (wDone ? ' ok' : '') + '">Cardio ' + (wDone ? '✓ done' : '· to do') + '</span>' +
         '<span class="ds-pill' + (lDone ? ' ok' : '') + '">Lesson ' + (lDone ? '✓ done' : '· to do') + '</span>' +
+        frBtn +
         '<button class="btn mark-btn' + (complete ? ' done' : '') + '" data-markday="1" data-marks="' + (sDay ? sDay.id : '') + '" data-markc="' + cDay.id + '" data-markl="' + lDay.id + '">' + (complete ? '✓ Day done — undo' : 'Mark day done') + '</button>' +
         '</div>';
     }
@@ -5226,7 +5308,7 @@
         '<p class="week-mod"><strong>' + PHASE_NAMES[ctx.phase] + ' · Week ' + (ctx.week + 1) + ' — ' + mod.label + '.</strong> ' + mod.focus + '</p>' +
         '<p class="wgt-tag"><strong>Wrist / ankle weights:</strong> ' + WEIGHT_TAG[(view.sDay || ctx).base] + '</p>' +
         dayStatusHTML(view) +
-        '<div class="chunks">' + (view.sDay ? strengthChunkHTML(view.sDay, sChip) : restChunkHTML()) + walkChunkHTML(view.cDay) + '</div>' +
+        '<div class="chunks">' + (view.fullRest ? fullRestChunkHTML() : (view.sDay ? strengthChunkHTML(view.sDay, sChip) : restChunkHTML()) + walkChunkHTML(view.cDay)) + '</div>' +
         queueHTML(lDay, lChip) +
         studyLinksHTML(lDay) +
         '<div class="recall"><span class="rk">End-of-day recall — spoken when your last chunk finishes</span><p>' + lDay.recall + '</p></div>' +
@@ -5255,7 +5337,7 @@
         return;
       }
       var a = assignments()[focusIdx], today = todayDate();
-      curView = { sDay: a.sDay, sCatch: a.sCatch, cDay: a.cDay, lDay: a.lDay, lCatch: a.lCatch, ctxDay: a.nominal, secId: a.iso };
+      curView = { sDay: a.sDay, sCatch: a.sCatch, cDay: a.cDay, lDay: a.lDay, lCatch: a.lCatch, ctxDay: a.nominal, secId: a.iso, iso: a.iso, fullRest: !!a.fullRest };
       var diff = daysBetween(today, a.date);
       var rel = diff === 0 ? '<span class="today-chip">Today</span>'
         : (diff === 1 ? '<span class="rel-chip">Tomorrow</span>'
@@ -5276,8 +5358,12 @@
       asg.forEach(function (a) {
         if (!a.cDay) return;
         if (a.sDay) { sDen++; if (strengthDone(a.sDay)) s++; }
-        wDen += a.cDay.walkMin;
-        if (cardioDone(a.cDay)) w += a.cDay.walkMin;
+        /* a full-rest date has no cardio target at all — it adds nothing
+           to the walking total owed or done, so no phantom minutes */
+        if (!a.fullRest) {
+          wDen += a.cDay.walkMin;
+          if (cardioDone(a.cDay)) w += a.cDay.walkMin;
+        }
         /* Lessons count each concept ONCE, keyed to the plan day that owns
            it — the concept scheduled for a window date (a.nominal), the
            same plan-day keying phase % uses for portions. A carried-over
@@ -5891,8 +5977,25 @@
         renderDays(); repaintAll();
         return;
       }
+      var frBtn = e.target.closest("[data-fullrest]");
+      if (frBtn) {
+        var frRes = toggleFullRest(frBtn.getAttribute("data-fullrest"));
+        renderDays(); repaintAll();
+        if (!frRes.on) showToast("Full rest removed — " + frLabel(frBtn.getAttribute("data-fullrest")) + " is back to its normal plan, no penalty.");
+        else if (frRes.movedFrom) showToast("Full rest moved: " + frLabel(frRes.movedFrom) + " is back to its normal plan, and " + frLabel(frBtn.getAttribute("data-fullrest")) + " is now this week's full-rest day — no strength, no cardio. Only one full-rest day per week.");
+        else showToast(frLabel(frBtn.getAttribute("data-fullrest")) + " is this week's full-rest day — no strength, no cardio, nothing owed. The session moves to the next day; the lesson still runs.");
+        return;
+      }
       var markBtn = e.target.closest("[data-markday]");
       if (markBtn) {
+        if (markBtn.getAttribute("data-markfr")) {
+          /* a full-rest day has no strength or cardio to mark — the
+             day-done button covers its lesson only */
+          var frLDay = dayById(markBtn.getAttribute("data-markl"));
+          setLessonDone(frLDay, !lessonDone(frLDay));
+          renderDays(); repaintAll();
+          return;
+        }
         var msId = markBtn.getAttribute("data-marks");
         var mView = {
           sDay: msId ? dayById(msId) : null,
