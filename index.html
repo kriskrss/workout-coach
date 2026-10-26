@@ -1526,6 +1526,7 @@
         ep("641d6e50-6261-4e5d-a420-2b504084b9c8", "episodes/ep-00f557d0-72ac-433e-b59b-ac6e57e230d8.mp3", "Decode the Coding Interview in JavaScript: Real-World Examples: Word Boards and Card Games", 8.0)
       ],
       "P0W1-sun": [
+        ep("episodes/special", "api-protocols.mp3", "How Programs Talk: REST, SOAP, RPC, gRPC, GraphQL — and the New Agent Protocols", 8.87),
         ep("primers", "episodes/primers/primer-B2-sun.mp3", "Primer: How Apps on Your Phone Are Designed", 3.7),
         ep("a53fdfd7-ff38-49e7-9c5e-eb7a9c7235e6", "episodes/ep-3f6e601f-082d-46f8-a247-fc6596f8ffab.mp3", "Grokking the Mobile System Design Interview: Getting Started, What Mobile System Design Is", 9.2),
         ep("a53fdfd7-ff38-49e7-9c5e-eb7a9c7235e6", "episodes/ep-edc0eb9d-1c8f-4a3c-9592-1c3ead87198e.mp3", "Grokking the Mobile System Design Interview: Local Storage, Caching, and Offline-First Sync", 7.8),
@@ -2514,7 +2515,33 @@
     ]
   },
   "B2-sun": {
-    "youtube": [],
+    "youtube": [
+      {
+        "title": "6 API Architectural Styles in 1 Minute",
+        "url": "https://www.youtube.com/watch?v=B21GOAi6PxU",
+        "channel": "—"
+      },
+      {
+        "title": "Model Context Protocol (MCP), clearly explained (why it matters)",
+        "url": "https://www.youtube.com/watch?v=7j_NE6Pjv-E",
+        "channel": "—"
+      },
+      {
+        "title": "MCP vs API: How Model Context Protocol Really Works",
+        "url": "https://www.youtube.com/watch?v=OWLSQHujyfw",
+        "channel": "—"
+      },
+      {
+        "title": "A2A vs MCP Explained: The A2A Protocol v1.0, Step by Step",
+        "url": "https://www.youtube.com/watch?v=y2jhDQbMHac",
+        "channel": "—"
+      },
+      {
+        "title": "A2A Protocol Explained: What Agent-to-Agent Communication Actually Is",
+        "url": "https://www.youtube.com/watch?v=oChhVa4SltU",
+        "channel": "—"
+      }
+    ],
     "educative": [
       {
         "course": "Grokking the Mobile System Design Interview",
@@ -2531,6 +2558,24 @@
       {
         "course": "Decode the Coding Interview in JavaScript: Real-World Examples",
         "url": "https://www.educative.io/courses/decode-coding-interview-js"
+      }
+    ],
+    "resources": [
+      {
+        "title": "Model Context Protocol — official documentation",
+        "url": "https://modelcontextprotocol.io"
+      },
+      {
+        "title": "A2A Protocol — official site",
+        "url": "https://a2a-protocol.org"
+      },
+      {
+        "title": "MCP vs A2A vs ACP: Which Agent Protocol Does What?",
+        "url": "https://casys.ai/blog/mcp-a2a-acp-agent-protocols"
+      },
+      {
+        "title": "REST vs GraphQL vs gRPC: Differences, Performance, and When to Use",
+        "url": "https://www.designgurus.io/blog/rest-graphql-grpc-system-design"
       }
     ]
   },
@@ -5048,11 +5093,12 @@
     function studyLinksHTML(day) {
       var data = STUDY_LINKS[studyKey(day)];
       if (!data) return "";
-      var yt = data.youtube || [], ed = data.educative || [];
-      if (!yt.length && !ed.length) return "";
+      var yt = data.youtube || [], ed = data.educative || [], rs = data.resources || [];
+      if (!yt.length && !ed.length && !rs.length) return "";
       var counts = [];
       if (yt.length) counts.push(yt.length + (yt.length === 1 ? " video" : " videos"));
       if (ed.length) counts.push(ed.length + (ed.length === 1 ? " course" : " courses"));
+      if (rs.length) counts.push(rs.length + (rs.length === 1 ? " resource" : " resources"));
       var h = '<details class="study-links"><summary>Study links' + (counts.length ? " · " + counts.join(" · ") : "") + '</summary><div class="sl-body">';
       if (yt.length) {
         h += '<div class="sl-group"><h4>Watch</h4><ul>' + yt.map(function (v) {
@@ -5062,6 +5108,11 @@
       if (ed.length) {
         h += '<div class="sl-group"><h4>Read on Educative</h4><ul>' + ed.map(function (c) {
           return '<li><a href="' + escHTML(c.url) + '" target="_blank" rel="noopener">' + escHTML(c.course) + '</a></li>';
+        }).join("") + '</ul></div>';
+      }
+      if (rs.length) {
+        h += '<div class="sl-group"><h4>Resources</h4><ul>' + rs.map(function (r) {
+          return '<li><a href="' + escHTML(r.url) + '" target="_blank" rel="noopener">' + escHTML(r.title) + '</a></li>';
         }).join("") + '</ul></div>';
       }
       return h + '</div></details>';
@@ -5086,7 +5137,7 @@
         if (typeof embedFailedKey !== "undefined" && embedFailedKey === day.id + ":" + i) cls += (cls ? " " : "") + "ext-failed";
         var parts = e.title.split(": ");
         var course = parts.length > 1 ? parts[0] : "Podcast";
-        var ptag = e.feed === FEED + "primers" ? '<span class="primer-tag">Primer</span>' : '';
+        var ptag = e.feed === FEED + "primers" ? '<span class="primer-tag">Primer</span>' : (e.feed === FEED + "episodes/special" ? '<span class="primer-tag">Special</span>' : '');
         return '<li data-ep="' + i + '" data-day="' + day.id + '" class="' + cls + '"><span class="n">' + (i + 1) + '</span>' +
           '<span class="t">' + ptag + e.title + ' <a class="play-link" href="' + e.url + '" data-play="1">Play ↗</a> <a href="' + e.feed + '" target="_blank" rel="noopener" data-feed="1">course feed ↗</a></span>' +
           '<button class="heard-btn' + (i < st.ep ? ' on' : '') + '" data-heard="1" data-day="' + day.id + '" data-ep="' + i + '" aria-label="Mark episode ' + (i + 1) + ' as listened" title="Mark as listened">✓</button>' +
