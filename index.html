@@ -393,12 +393,14 @@
       }
       .pb-btn.ghost { background: var(--panel-2); color: var(--ink); border: 1px solid var(--line); font-size: 14px; }
       .pb-btn.rate { width: auto; border-radius: 99px; padding: 0 13px; font-size: 13.5px; font-weight: 700; font-variant-numeric: tabular-nums; }
+      .pb-rate { display: flex; align-items: center; gap: 4px; flex: none; }
+      .pb-btn.rate-step { width: 34px; border-radius: 99px; padding: 0; font-size: 19px; font-weight: 700; line-height: 1; }
       .pb-info { flex: 1; min-width: 0; }
       .pb-info .t { font-weight: 700; font-size: 15px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .pb-info .s { font-size: 12.5px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
       .pb-prog { height: 4px; background: var(--bar-bg); border-radius: 99px; margin-top: 10px; overflow: hidden; }
       .pb-prog i { display: block; height: 100%; width: 0%; background: var(--accent); }
-      @media (max-width: 480px) { .playerbar .row { gap: 8px; } .pb-btn.rate { padding: 0 10px; } }
+      @media (max-width: 480px) { .playerbar .row { gap: 8px; } .pb-btn.rate { padding: 0 10px; } .pb-btn.rate-step { width: 29px; } .pb-rate { gap: 3px; } }
       /* ---------- phases / gating / overview ---------- */
       .phasebar { margin-top: 20px; background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 14px 18px 16px; box-shadow: var(--shadow); }
       .phasebar .pb-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
@@ -693,7 +695,11 @@
           <button class="pb-btn ghost" id="pbPrev" aria-label="Previous episode">⏮</button>
           <button class="pb-btn" id="pbPlay" aria-label="Play or pause podcast">▶</button>
           <button class="pb-btn ghost" id="pbNext" aria-label="Next episode">⏭</button>
-          <button class="pb-btn ghost rate" id="pbRate" aria-label="Playback speed — tap to change">1×</button>
+          <span class="pb-rate" role="group" aria-label="Playback speed controls">
+            <button class="pb-btn ghost rate-step" id="pbRateDown" aria-label="Decrease playback speed">−</button>
+            <button class="pb-btn ghost rate" id="pbRate" aria-label="Playback speed — tap to increase; use the minus and plus buttons on either side to go down or up">1×</button>
+            <button class="pb-btn ghost rate-step" id="pbRateUp" aria-label="Increase playback speed">+</button>
+          </span>
           <a class="pb-btn ghost pb-open" id="pbOpen" href="#" aria-label="Play episode in your browser player" style="display:none;">Play in browser ↗</a>
           <div class="pb-info">
             <div class="t" id="pbTitle">No episode loaded</div>
@@ -5514,12 +5520,21 @@
     function hideOpenFallback() { var b = $("pbOpen"); if (b) b.style.display = "none"; }
     function openEpisodeExternally(dayId, idx) {
       // Navigate via the row's own plain Play anchor (a real browser navigation
-      // from this tap), never window.open. Fall back to a same-frame location
-      // change only if the anchor isn't in the DOM for some reason.
+      // from this tap), never window.open. If the anchor isn't in the DOM for
+      // some reason, build an equivalent plain anchor to the episode instead.
       var a = document.querySelector('.queue li[data-day="' + dayId + '"][data-ep="' + idx + '"] a[data-play]');
       if (a) { a.click(); return; }
       var day = dayById(dayId);
-      if (day && day.episodes[idx]) window.location.href = day.episodes[idx].url;
+      if (day && day.episodes[idx]) {
+        // Same plain-anchor navigation, built on the spot: a real link to
+        // the episode's own URL, clicked from this tap — never a
+        // window.open or a copied page address.
+        var tmp = document.createElement("a");
+        tmp.href = day.episodes[idx].url;
+        document.body.appendChild(tmp);
+        tmp.click();
+        tmp.remove();
+      }
     }
     function markEmbedFailed() {
       if (!cur.dayId) return;
@@ -5544,17 +5559,37 @@
     }
     /* =============== PLAYBACK SPEED =============== */
     var RATES = [0.75, 1, 1.25, 1.5, 1.75, 2];
+    /* A stored or imported speed that isn't on the list (e.g. 1.3 from
+       another copy's progress file) snaps to the nearest listed rate, so
+       the next step never jumps unexpectedly. */
+    function nearestRate(r) {
+      var best = RATES[1], bestDiff = Infinity;
+      for (var i = 0; i < RATES.length; i++) {
+        var d = Math.abs(RATES[i] - r);
+        if (d < bestDiff) { bestDiff = d; best = RATES[i]; }
+      }
+      return best;
+    }
     function applyRate() {
+      if (RATES.indexOf(store.rate) === -1) store.rate = nearestRate(store.rate);
       try { audio.playbackRate = store.rate; } catch (e) {}
       var b = $("pbRate");
       if (b) b.textContent = store.rate + "×";
     }
-    $("pbRate").addEventListener("click", function () {
+    /* One two-way stepper: + steps up, − steps down, and the rate label
+       itself still cycles up on tap. Both directions wrap — stepping down
+       from 0.75× lands on 2×, stepping up from 2× lands on 0.75×. */
+    function stepRate(dir) {
       var idx = RATES.indexOf(store.rate);
-      store.rate = RATES[(idx + 1) % RATES.length];
+      if (idx === -1) idx = RATES.indexOf(nearestRate(store.rate));
+      store.rate = RATES[(idx + dir + RATES.length) % RATES.length];
       save();
       applyRate();
-    });
+    }
+    $("pbRate").addEventListener("click", function () { stepRate(1); });
+    var rateDown = $("pbRateDown"), rateUp = $("pbRateUp");
+    if (rateDown) rateDown.addEventListener("click", function () { stepRate(-1); });
+    if (rateUp) rateUp.addEventListener("click", function () { stepRate(1); });
 
     function loadEpisode(dayId, idx, autoplay) {
       var day = dayById(dayId), st = store.days[dayId];
