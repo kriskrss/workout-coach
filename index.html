@@ -594,21 +594,88 @@
       .sw-state { font-size: 13px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--ink); text-align: center; }
       .sw-round { font-size: 12.5px; font-weight: 500; color: var(--muted); text-align: center; margin-top: 4px; font-variant-numeric: tabular-nums; }
       .sw-center .sw-state { margin-bottom: 2px; }
-      @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+      /* ===== MOTION SYSTEM + NAVBAR / HERO / FOOTER CRAFT ===== */
+      .navbar { position: sticky; top: 0; z-index: 50; background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); border-bottom: 1px solid var(--line); }
+      .navbar-inner { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 60px; padding-top: 8px; padding-bottom: 8px; }
+      .brand-lockup { display: flex; align-items: center; gap: 10px; min-width: 0; }
+      .brand-lockup .logo-mark { width: 32px; height: 32px; }
+      .app-name { font-size: 17px; font-weight: 700; letter-spacing: -0.02em; white-space: nowrap; }
+      .navbar .view-tabs { margin: 0; border-bottom: none; position: relative; gap: 4px; }
+      .navbar .view-tab { border-bottom: none; margin-bottom: 0; padding: 10px 14px; border-radius: 99px; transition: color .2s ease, transform .18s ease, opacity .2s ease; }
+      .navbar .view-tab[aria-selected="true"] { border-bottom-color: transparent; }
+      .tab-indicator { position: absolute; left: 0; bottom: -1px; height: 2px; background: var(--ink); border-radius: 99px; width: 60px; transform: translateX(0); transition: transform .32s cubic-bezier(.22,1,.36,1), width .32s cubic-bezier(.22,1,.36,1), opacity .2s ease; pointer-events: none; }
+      @media (max-width: 560px) { .navbar-inner { flex-wrap: wrap; min-height: 0; } .navbar .view-tabs { width: 100%; } }
+      .hero { position: relative; overflow: hidden; padding-top: 28px; }
+      .hero-ghost { position: absolute; right: -8px; top: -18px; font-size: 220px; font-weight: 200; line-height: 1; color: var(--panel-2); opacity: .55; pointer-events: none; user-select: none; z-index: 0; letter-spacing: -0.05em; }
+      .hero-num, .hero-focus { position: relative; z-index: 1; }
+      @keyframes heroNumIn { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes heroFocusIn { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes riseIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes viewIn { from { opacity: 0; transform: translateX(10px); } to { opacity: 1; transform: translateX(0); } }
+      @keyframes dayIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+      @keyframes pulseFace { 0% { transform: scale(1); } 35% { transform: scale(1.035); } 100% { transform: scale(1); } }
+      @keyframes glyphIn { from { opacity: 0; transform: scale(.72); } to { opacity: 1; transform: scale(1); } }
+      @keyframes checkPop { 0% { transform: scale(.6); } 55% { transform: scale(1.18); } 100% { transform: scale(1); } }
+      @keyframes collapseIn { from { opacity: 0; transform: translateY(-4px) scale(.99); } to { opacity: 1; transform: translateY(0) scale(1); } }
+      body.is-loaded .hero-num { animation: heroNumIn .42s cubic-bezier(.22,1,.36,1) both; }
+      body.is-loaded .hero-focus { animation: heroFocusIn .42s cubic-bezier(.22,1,.36,1) .07s both; }
+      .hero-num.is-changing, .hero-focus.is-changing { animation: heroNumIn .34s cubic-bezier(.22,1,.36,1) both; }
+      .reveal { animation: riseIn .38s cubic-bezier(.22,1,.36,1) both; }
+      .reveal-1 { animation-delay: .05s; } .reveal-2 { animation-delay: .11s; } .reveal-3 { animation-delay: .17s; } .reveal-4 { animation-delay: .23s; }
+      .view.view-enter { animation: viewIn .32s cubic-bezier(.22,1,.36,1) both; }
+      #days.day-enter { animation: dayIn .34s cubic-bezier(.22,1,.36,1) both; }
+      .cal-day { transition: transform .18s ease, opacity .2s ease, box-shadow .22s ease, background .2s ease; }
+      .cal-day:active { transform: scale(.97); }
+      button, .btn, .view-tab, .cal-day, .ex-row, .queue li, .ov-day, .q-next { transition: transform .18s ease, opacity .2s ease, background .2s ease, color .2s ease, border-color .2s ease; }
+      button:active, .btn:active, .toggle-btn:active, .mode-btn:active, .pb-btn:active, .reset-btn:active, .q-show:active { transform: scale(.97); }
+      .ex-row:active, .ov-day:active { transform: scale(.99); }
+      .sw-prog { transition: stroke-dashoffset .12s linear !important; will-change: stroke-dashoffset; }
+      .sw-face { transition: transform .2s ease; }
+      .sw-face.pulse { animation: pulseFace .38s ease both; }
+      .btn-start, .pb-btn { transition: transform .18s ease, background .2s ease, color .2s ease; }
+      .btn-start .glyph, .pb-btn .glyph { display: inline-block; animation: glyphIn .22s ease both; }
+      .done-wrap input:checked, .blk-tick input:checked { animation: checkPop .28s ease both; }
+      .chunk { transition: opacity .25s ease, transform .25s ease; }
+      .chunk-expand { animation: collapseIn .3s ease both; }
+      .chunk.is-collapsed .chunk-body { display: none; }
+      .bar i { transition: width .5s cubic-bezier(.22,1,.36,1); }
+      .pb-prog i { transition: width .18s linear; }
+      .queue li { transition: opacity .22s ease, transform .18s ease, background .22s ease; }
+      .queue li.playing { animation: riseIn .28s ease both; }
+      .pstat .v span { display: inline-block; }
+      /* Footer — designed closing block */
+      .app-footer { margin-top: 40px; border-top: 1px solid var(--line); padding: 28px 0 12px; }
+      .footer-wordmark { font-size: 44px; font-weight: 200; letter-spacing: -0.03em; line-height: 1; color: var(--ink); }
+      .footer-actions { display: flex; flex-wrap: wrap; gap: 8px 20px; margin-top: 20px; align-items: center; }
+      .footer-link { font: inherit; font-size: 15px; font-weight: 600; color: var(--ink); background: none; border: none; padding: 10px 0; min-height: 44px; cursor: pointer; text-decoration: underline; text-underline-offset: 4px; display: inline-flex; align-items: center; }
+      .footer-link:active { transform: scale(.97); }
+      .footer-code { margin-top: 12px; }
+      .footer-danger { margin-top: 28px; border-top: 1px solid var(--line); padding-top: 16px; }
+      .footer-danger-label { font-size: 12px; font-weight: 600; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); margin-bottom: 10px; }
+      .app-footer .reset-note { font-size: 13.5px; }
+      .app-footer .reset-note code { background: var(--panel-2); }
+      .footer-io-note { margin-top: 16px; }
+      @media (prefers-reduced-motion: reduce) { *, *::before, *::after { transition: none !important; animation: none !important; scroll-behavior: auto !important; } .hero-ghost { display: none; } }
 
     </style>
   </head>
   <body>
-    <div class="wrap">
-      <header class="hero">
-        <div class="brand"><svg class="logo-mark" viewBox="0 0 48 48" role="img" aria-label="Dumbbell logo"><rect x="1.5" y="1.5" width="45" height="45" rx="12" fill="var(--accent)"/><rect x="9" y="14" width="4.5" height="20" rx="2" fill="#fff"/><rect x="15" y="18" width="4" height="12" rx="2" fill="#fff" opacity=".85"/><rect x="34.5" y="14" width="4.5" height="20" rx="2" fill="#fff"/><rect x="29" y="18" width="4" height="12" rx="2" fill="#fff" opacity=".85"/><rect x="17" y="22.25" width="14" height="3.5" rx="1.75" fill="#fff"/></svg></div>
-        <div class="hero-num" id="heroNum" aria-hidden="true"></div>
-        <p class="hero-focus" id="heroFocus"></p>
+    <header class="navbar">
+      <div class="wrap navbar-inner">
+        <div class="brand-lockup"><div class="brand"><svg class="logo-mark" viewBox="0 0 48 48" role="img" aria-label="Dumbbell logo"><rect x="1.5" y="1.5" width="45" height="45" rx="12" fill="var(--accent)"/><rect x="9" y="14" width="4.5" height="20" rx="2" fill="#fff"/><rect x="15" y="18" width="4" height="12" rx="2" fill="#fff" opacity=".85"/><rect x="34.5" y="14" width="4.5" height="20" rx="2" fill="#fff"/><rect x="29" y="18" width="4" height="12" rx="2" fill="#fff" opacity=".85"/><rect x="17" y="22.25" width="14" height="3.5" rx="1.75" fill="#fff"/></svg></div><span class="app-name">Workout Plan</span></div>
         <nav class="view-tabs" role="tablist" aria-label="App views">
+          <span class="tab-indicator" id="tabIndicator" aria-hidden="true"></span>
           <button class="view-tab" id="tabWorkout" data-viewtab="workout" role="tab" aria-selected="true" aria-controls="view-workout">Workout</button>
           <button class="view-tab" id="tabMetrics" data-viewtab="metrics" role="tab" aria-selected="false" aria-controls="view-metrics">Metrics</button>
         </nav>
-      </header>
+      </div>
+    </header>
+    <div class="wrap">
+      <section class="hero" aria-label="Today">
+        <div class="hero-ghost" id="heroGhost" aria-hidden="true"></div>
+        <div class="hero-num" id="heroNum" aria-hidden="true"></div>
+        <p class="hero-focus" id="heroFocus"></p>
+      </section>
 
       <div class="view view-workout" id="view-workout" role="tabpanel" aria-labelledby="tabWorkout">
         <div class="cal-head"><h2>7-day window</h2><span id="calRange"></span></div>
@@ -685,9 +752,23 @@
         <p><strong>Progression &amp; safety:</strong> start with the light pair everywhere for the first week, even if a heavier set is available. Progress duration first, then weight — one change at a time. One load source at a time: count the weights as part of the load. Take them off for joint pain (wrist, elbow, shoulder, knee, ankle), tingling or numbness. Fit: sit the weight just above the wrist or ankle bone — snug enough not to slide, loose enough that circulation is never restricted.</p>
       </section></details>
 
-      <details class="ref">
-        <summary>Reset progress</summary>
-        <div class="ref-body">
+      <h2 class="sec-title">The program <span>Beginner · Intermediate · Advanced</span></h2>
+      <div id="overview"></div>
+
+      <footer class="app-footer">
+        <div class="footer-wordmark">Workout Plan</div>
+        <p class="reset-note footer-io-note">Each copy of this app (Safari, the Home Screen icon) keeps its own progress on this device. Export copies everything stored here — every tick, phase progress and day assignment — as a JSON file and a text code. Importing that code or file into another copy replaces that copy's progress with this one, so nothing is lost in the move.</p>
+        <div class="footer-actions">
+          <button class="footer-link" id="exportBtn" type="button">Export progress</button>
+          <button class="footer-link" id="copyCodeBtn" type="button" hidden>Copy code</button>
+          <label class="footer-link" for="importFile">Import from file…</label>
+          <input class="io-file-input" type="file" id="importFile" accept=".json,application/json,text/plain" />
+          <button class="footer-link" id="importBtn" type="button" data-label="Import progress">Import progress</button>
+        </div>
+        <textarea id="progressCode" class="prog-code footer-code" rows="4" spellcheck="false" placeholder="Export fills this box with your progress code. To import, paste a code here (or choose a file above), then tap Import progress."></textarea>
+        <p class="reset-note io-msg" id="ioMsg" hidden></p>
+        <div class="footer-danger">
+          <div class="footer-danger-label">Reset</div>
           <p class="reset-note">Progress is stored only on this device, so resets run here in the app. Each button clears ticks stored on this device and asks for a confirming second tap before anything is cleared. Playback speed and the coach setting are always kept.</p>
           <div class="reset-grid">
             <button class="reset-btn" data-resetact="today" data-label="Reset today">Reset today</button>
@@ -696,26 +777,8 @@
             <button class="reset-btn" data-resetact="all" data-label="Reset everything">Reset everything</button>
           </div>
           <p class="reset-note">The same resets can be triggered by adding a reset option to the page address: <code>?reset=today</code>, <code>?reset=today-lesson</code>, <code>?reset=day:2026-10-18</code> (append <code>:lesson</code>, <code>:strength</code> or <code>:cardio</code> to clear one part of that day), <code>?reset=week</code>, or <code>?reset=all</code>. The option is applied once, on load, then removed from the address.</p>
-          <div class="prog-io">
-            <h3 class="prog-io-h">Move progress to another copy</h3>
-            <p class="reset-note">Each copy of this app (Safari, the Home Screen icon) keeps its own progress on this device. Export copies everything stored here — every tick, phase progress and day assignment — as a JSON file and a text code. Importing that code or file into another copy replaces that copy's progress with this one, so nothing is lost in the move.</p>
-            <div class="reset-grid">
-              <button class="reset-btn" id="exportBtn" type="button">Export progress</button>
-              <button class="reset-btn" id="copyCodeBtn" type="button" hidden>Copy code</button>
-              <label class="reset-btn" for="importFile">Import from file…</label>
-              <input class="io-file-input" type="file" id="importFile" accept=".json,application/json,text/plain" />
-            </div>
-            <textarea id="progressCode" class="prog-code" rows="4" spellcheck="false" placeholder="Export fills this box with your progress code. To import, paste a code here (or choose a file above), then tap Import progress."></textarea>
-            <div class="reset-grid">
-              <button class="reset-btn" id="importBtn" type="button" data-label="Import progress">Import progress</button>
-            </div>
-            <p class="reset-note io-msg" id="ioMsg" hidden></p>
-          </div>
         </div>
-      </details>
-
-      <h2 class="sec-title">The program <span>Beginner · Intermediate · Advanced</span></h2>
-      <div id="overview"></div>
+      </footer>
       </div>
     </div>
 
@@ -4385,6 +4448,30 @@
        and reset panels). The last-used tab persists in store.view, like
        the speed and coach settings. Switching views never re-renders the
        day, touches a tick, or disturbs the player — it only shows/hides. */
+    function reducedMotion() { return !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches); }
+    function positionTabIndicator() {
+      var ind = $("tabIndicator"); if (!ind) return;
+      var active = document.querySelector(".view-tab[aria-selected='true']");
+      if (!active) { ind.style.opacity = "0"; return; }
+      ind.style.opacity = "1";
+      ind.style.width = active.offsetWidth + "px";
+      ind.style.transform = "translateX(" + active.offsetLeft + "px)";
+    }
+    function tweenNum(el, to) {
+      if (!el) return;
+      var from = parseInt(el.textContent, 10); if (isNaN(from)) from = 0;
+      if (from === to || reducedMotion()) { el.textContent = to; return; }
+      var t0 = performance.now(), dur = 360;
+      function step(t) { var p = Math.min(1, (t - t0) / dur); p = 1 - Math.pow(1 - p, 3); el.textContent = Math.round(from + (to - from) * p); if (p < 1) requestAnimationFrame(step); }
+      requestAnimationFrame(step);
+    }
+    function setGlyph(btn, glyph) {
+      if (!btn) return;
+      var cur = btn.getAttribute("data-glyph");
+      if (cur === glyph) return;
+      btn.setAttribute("data-glyph", glyph);
+      btn.innerHTML = '<span class="glyph">' + glyph + '</span>';
+    }
     function applyView(name, persist) {
       store.view = name === "metrics" ? "metrics" : "workout";
       if (persist) save();
@@ -4395,6 +4482,9 @@
       var tw = $("tabWorkout"), tm = $("tabMetrics");
       if (tw) tw.setAttribute("aria-selected", onWorkout ? "true" : "false");
       if (tm) tm.setAttribute("aria-selected", onWorkout ? "false" : "true");
+      var shown = onWorkout ? vw : vm;
+      if (shown && !reducedMotion()) { shown.classList.remove("view-enter"); void shown.offsetWidth; shown.classList.add("view-enter"); }
+      requestAnimationFrame(positionTabIndicator);
       if (!onWorkout) { updateProgress(); renderOverview(); }
     }
 
@@ -5442,14 +5532,25 @@
        actually assigned to today (floated sessions included), "Rest day"
        on a scheduled rest day, "Full rest" on a marked full-rest day.
        Refreshed on every renderDays() so it never drifts from the cards. */
+    var heroPrev = { num: null, focus: null };
     function renderHeroFocus() {
-      var el = $("heroFocus");
+      var el = $("heroFocus"), numEl = $("heroNum"), ghost = $("heroGhost");
       if (!el) return;
-      var a = todayView(), txt;
+      var list = assignments();
+      var a = (list && list[focusIdx]) || todayView(), txt;
       if (a.fullRest) txt = "Full rest";
       else if (a.sDay && a.sDay.strengthName) txt = a.sDay.strengthName.replace(/^[A-Z]\s*·\s*/, "");
       else txt = "Rest day";
+      var num = a.date ? a.date.getDate() : new Date().getDate();
+      var changed = heroPrev.num !== null && (heroPrev.num !== num || heroPrev.focus !== txt);
       el.textContent = txt;
+      if (numEl) numEl.textContent = num;
+      if (ghost) ghost.textContent = num;
+      if (changed && !reducedMotion()) {
+        [numEl, el].forEach(function (n) { if (!n) return; n.classList.remove("is-changing"); void n.offsetWidth; n.classList.add("is-changing"); });
+        setTimeout(function () { [numEl, el].forEach(function (n) { if (n) n.classList.remove("is-changing"); }); }, 380);
+      }
+      heroPrev = { num: num, focus: txt };
     }
 
     /* Only the focused day renders in full — the calendar strip above is the week.
@@ -5482,6 +5583,7 @@
         : (diff === -1 ? '<span class="rel-chip">Yesterday</span>' : ''));
       var back = diff !== 0 ? '<button class="back-today" data-backtoday="1">← Back to today</button>' : '';
       $("days").innerHTML = daySectionHTML(curView, DAYS[mon0(a.date)].day, MONTH_S[a.date.getMonth()] + " " + a.date.getDate(), rel + back);
+      if (!reducedMotion()) { var dw = $("days"); dw.classList.remove("day-enter"); void dw.offsetWidth; dw.classList.add("day-enter"); }
       updateProgress();
     }
     function updateProgress() {
@@ -5511,16 +5613,16 @@
         if (owner && !seenL[owner.id]) { seenL[owner.id] = 1; lDen++; if (lessonDone(owner)) l++; }
         if (viewComplete(a)) dd++;
       });
-      $("progDays").textContent = dd;
+      tweenNum($("progDays"), dd);
       $("progDaysDen").textContent = " / " + asg.length + " days";
       $("barDays").style.width = (asg.length ? dd / asg.length * 100 : 0) + "%";
-      $("progStrength").textContent = s;
+      tweenNum($("progStrength"), s);
       $("progStrengthDen").textContent = " / " + sDen + " sessions";
       $("barStrength").style.width = (sDen ? s / sDen * 100 : 0) + "%";
-      $("progWalk").textContent = w;
+      tweenNum($("progWalk"), w);
       $("progWalkDen").textContent = " / " + wDen + " min";
       $("barWalk").style.width = (wDen ? w / wDen * 100 : 0) + "%";
-      var pl = $("progLesson"); if (pl) pl.textContent = l;
+      var pl = $("progLesson"); if (pl) tweenNum(pl, l);
       var pld = $("progLessonDen"); if (pld) pld.textContent = " / " + lDen + " concepts";
       var bl2 = $("barLesson"); if (bl2) bl2.style.width = (lDen ? l / lDen * 100 : 0) + "%";
       renderCal();
@@ -5747,7 +5849,7 @@
     }
     function updatePlayerBar() {
       var btn = $("pbPlay");
-      btn.textContent = (!audio.paused && cur.dayId) ? "❚❚" : "▶";
+      setGlyph(btn, (!audio.paused && cur.dayId) ? "❚❚" : "▶");
       if (!cur.dayId) { $("pbTitle").textContent = "No episode loaded"; return; }
       var day = dayById(cur.dayId);
       if (!day.episodes.length) { $("pbTitle").textContent = "No queue for this day yet"; return; }
@@ -5963,7 +6065,7 @@
         if (!sess.cues.start) { sess.cues.start = true; speak(cardioStartCue(day, lDay.concept)); }
         else speak("Cardio resumed. " + fmtClock(sess.total - sess.elapsed) + " to go.");
       }
-      sess.timer = setInterval(function () { tick(sess); }, 250);
+      sess.timer = setInterval(function () { tick(sess); }, 50);
       paintSession(sess);
     }
     function pauseSession(sess) {
@@ -6114,9 +6216,18 @@
       }
       var btn = document.querySelector('button[data-start="' + type + '"][data-day="' + day.id + '"]');
       if (btn) {
-        btn.textContent = sess.running ? "❚❚" : "▶";
+        setGlyph(btn, sess.running ? "❚❚" : "▶");
         btn.setAttribute("aria-label", sess.running ? "Pause timer" : (sess.elapsed > 0 ? "Resume timer" : "Start timer"));
         btn.classList.toggle("running", sess.running);
+      }
+      /* period change (WORK ↔ REST) pulses the face once */
+      if (stateEl) {
+        var curState = stateEl.textContent;
+        if (sess._lastState && sess._lastState !== curState && sess.elapsed > 0 && !finished) {
+          var face = clock.closest ? clock.closest(".sw-face") : null;
+          if (face && !reducedMotion()) { face.classList.remove("pulse"); void face.offsetWidth; face.classList.add("pulse"); }
+        }
+        sess._lastState = curState;
       }
     }
 
@@ -6393,6 +6504,16 @@
     applyView(store.view, false);   // restore the last-used tab (Workout by default)
     renderDays();
     updateProgress();
+    /* load stagger: hero first, then sections rise in sequence */
+    requestAnimationFrame(function () {
+      document.body.classList.add("is-loaded");
+      positionTabIndicator();
+      if (!reducedMotion()) {
+        var seq = [document.querySelector(".cal-head"), $("calStrip"), $("days"), document.querySelector(".progress-grid"), $("phaseBar")];
+        seq.forEach(function (n, i) { if (n) { n.classList.add("reveal"); n.style.animationDelay = (0.05 + i * 0.06) + "s"; } });
+      }
+    });
+    window.addEventListener("resize", positionTabIndicator);
     if (pendingToast) { showToast(pendingToast); pendingToast = null; }
     (function () {
       var t = $("coachToggle");
@@ -6407,8 +6528,8 @@
     })();
     </script>
     <script>
-      // Hero numeral: today's date number, set once on load (presentational only).
-      (function () { var el = document.getElementById("heroNum"); if (el) el.textContent = new Date().getDate(); })();
+      // Hero ghost mirrors the numeral (presentational only; main script owns the numeral itself).
+      (function () { var g = document.getElementById("heroGhost"); var n = document.getElementById("heroNum"); if (g && n && !g.textContent) g.textContent = n.textContent || new Date().getDate(); })();
     </script>
   </body>
 </html>
