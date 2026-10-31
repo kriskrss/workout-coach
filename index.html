@@ -75,10 +75,6 @@
         margin: 0;
       }
       .hero-focus { margin: 4px 0 0; font-size: 15px; font-weight: 400; color: var(--muted); }
-      .hero h1 { font-size: 27px; line-height: 1.18; margin: 32px 0 8px; font-weight: 600; text-transform: none; }
-      .hero h1 .thin { color: var(--muted); font-weight: 400; }
-      .hero p.lede { margin: 0; max-width: 62ch; color: var(--muted); font-size: 15.5px; line-height: 1.5; }
-      .hero p.lede strong { color: var(--ink); font-weight: 600; }
       /* Metrics widget tiles — flat pale grey, numeral over label */
       .progress-grid {
         display: grid; grid-template-columns: 1fr 1fr; gap: 12px;
@@ -313,7 +309,6 @@
       .roadmap { margin-top: 16px; background: var(--panel-2); border: none; border-radius: 20px; padding: 20px; box-shadow: none; }
       .roadmap h3 { margin: 0 0 8px; font-size: 20px; font-weight: 600; }
       .roadmap ol { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; font-size: 15.5px; line-height: 1.55; }
-      .foot { color: var(--muted); font-size: 14px; margin: 32px 0 8px; line-height: 1.6; }
 
       /* ---------- calendar strip — equal columns, even gaps ---------- */
       .cal-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 24px 0 8px; }
@@ -609,8 +604,6 @@
         <div class="brand"><svg class="logo-mark" viewBox="0 0 48 48" role="img" aria-label="Dumbbell logo"><rect x="1.5" y="1.5" width="45" height="45" rx="12" fill="var(--accent)"/><rect x="9" y="14" width="4.5" height="20" rx="2" fill="#fff"/><rect x="15" y="18" width="4" height="12" rx="2" fill="#fff" opacity=".85"/><rect x="34.5" y="14" width="4.5" height="20" rx="2" fill="#fff"/><rect x="29" y="18" width="4" height="12" rx="2" fill="#fff" opacity=".85"/><rect x="17" y="22.25" width="14" height="3.5" rx="1.75" fill="#fff"/></svg></div>
         <div class="hero-num" id="heroNum" aria-hidden="true"></div>
         <p class="hero-focus" id="heroFocus"></p>
-        <h1>Move 60 minutes.<br /><span class="thin">Learn one concept a day.</span></h1>
-        <p class="lede">Every day pairs a <strong>20-minute strength session</strong> (5 days a week) with a <strong>walk — 40 minutes on strength days, a full hour on rest days</strong>. The two chunks can happen at different times. During each session, an audio coach cues the sets and plays the day's <strong>podcast queue</strong> — one lesson topic per day. Weekly total: <strong>100 min strength + 320 min walking</strong>.</p>
         <nav class="view-tabs" role="tablist" aria-label="App views">
           <button class="view-tab" id="tabWorkout" data-viewtab="workout" role="tab" aria-selected="true" aria-controls="view-workout">Workout</button>
           <button class="view-tab" id="tabMetrics" data-viewtab="metrics" role="tab" aria-selected="false" aria-controls="view-metrics">Metrics</button>
@@ -664,7 +657,6 @@
         <div class="ref-body">
           <div class="goals">
             <h2>The weekly split</h2>
-            <p>Five strength days and two rest days, on a fixed rotation. Strength days run 20 minutes; the walk is 40 minutes on strength days and 60 minutes on rest days.</p>
             <ol>
               <li><strong>Monday</strong> — Shoulders + triceps</li>
               <li><strong>Tuesday</strong> — Legs + chest</li>
@@ -723,9 +715,7 @@
       </details>
 
       <h2 class="sec-title">The program <span>Beginner · Intermediate · Advanced</span></h2>
-      <p style="margin:0 0 14px;color:var(--muted);font-size:15px;max-width:78ch;">Three phases, four week-templates each. A phase takes <strong style="color:var(--ink)">at least two weeks</strong> and only unlocks the next when <strong style="color:var(--ink)">every portion</strong> — every strength block, cardio phase and lesson — is ticked complete. Anything unfinished rolls forward and simply extends the phase. Tap any day to preview it; locked phases are read-only.</p>
       <div id="overview"></div>
-      <p class="foot">Every day of all twelve weeks — Beginner, Intermediate and Advanced — carries its full episode queue. Progress, done ticks, and playback position are saved on this device, so the strength and walk chunks can be split across the day and the audio picked up where it left off.</p>
       </div>
     </div>
 
