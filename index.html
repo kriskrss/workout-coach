@@ -96,6 +96,14 @@
       .bar i.l { background: var(--ink); }
       .pstat.voice { grid-column: 1 / -1; display: flex; flex-direction: row; justify-content: space-between; align-items: center; gap: 12px; }
       .pstat.voice .k { order: 0; }
+      .pstat.voice-picker { grid-column: 1 / -1; display: flex; flex-direction: column; align-items: stretch; justify-content: flex-start; gap: 12px; }
+      .pstat.voice-picker .k { order: 0; }
+      .voice-controls { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; }
+      .voice-select {
+        flex: 1 1 220px; min-width: 0; font: inherit; font-size: 14px; font-weight: 500;
+        color: var(--ink); background: var(--bg); border: 1px solid var(--line);
+        border-radius: 99px; padding: 0 16px; min-height: 44px;
+      }
       @media (max-width: 380px) { .pstat .v { font-size: 40px; } .pstat { padding: 16px; } }
       .toggle-btn {
         font: inherit; font-weight: 500; font-size: 14px; cursor: pointer;
@@ -710,6 +718,15 @@
           <div class="pstat voice">
             <div class="k">Audio coach voice</div>
             <button class="toggle-btn" id="coachToggle" aria-pressed="true">Coach: On</button>
+          </div>
+          <div class="pstat voice voice-picker">
+            <div class="k">Coach voice</div>
+            <div class="voice-controls">
+              <select class="voice-select" id="coachVoiceSelect" aria-label="Coach voice">
+                <option value="">Auto (most natural)</option>
+              </select>
+              <button class="toggle-btn" id="coachVoiceTest" type="button">Test voice</button>
+            </div>
           </div>
           <div class="pstat voice">
             <div class="k">Timer sounds — ticks &amp; beeps</div>
@@ -4349,6 +4366,7 @@
     try { store = JSON.parse(localStorage.getItem(LS_KEY) || "{}"); } catch (e) { store = {}; }
     if (!store.days) store.days = {};
     if (typeof store.coach !== "boolean") store.coach = true;
+    if (typeof store.coachVoice !== "string") store.coachVoice = "";
     if (typeof store.timerSounds !== "boolean") store.timerSounds = true;
     if (store.view !== "metrics" && store.view !== "workout") store.view = "workout";
     if (typeof store.rate !== "number" || !(store.rate > 0)) store.rate = 1;
@@ -5646,32 +5664,140 @@
     }
 
     /* =============== SPEECH COACH =============== */
+    var coachVoices = [];
+    var NATURAL_VOICE_NAMES = ["Ava", "Alex", "Samantha", "Allison", "Susan", "Nicky", "Aaron", "Tom", "Joelle", "Serena", "Kate", "Daniel"];
+    function refreshCoachVoices() {
+      if (!("speechSynthesis" in window)) { coachVoices = []; return coachVoices; }
+      try { coachVoices = window.speechSynthesis.getVoices() || []; } catch (e) { coachVoices = []; }
+      return coachVoices;
+    }
+    function isEnglishVoice(v) { return !!(v && v.lang && /^en([-_]|$)/i.test(v.lang)); }
+    function isEnUS(v) { return !!(v && v.lang && /^en[-_]US/i.test(v.lang)); }
+    function isEnGB(v) { return !!(v && v.lang && /^en[-_]GB/i.test(v.lang)); }
+    function voiceNameMatches(v, name) {
+      if (!v || !v.name) return false;
+      var esc = name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+      return new RegExp("(^|[^A-Za-z])" + esc + "([^A-Za-z]|$)", "i").test(v.name);
+    }
+    function pickAutoVoice(voices) {
+      var english = [];
+      for (var i = 0; i < voices.length; i++) if (isEnglishVoice(voices[i])) english.push(voices[i]);
+      if (!english.length) {
+        for (var d = 0; d < voices.length; d++) if (voices[d].default) return voices[d];
+        return voices.length ? voices[0] : null;
+      }
+      /* 1 — Premium / Enhanced English voices (downloaded high-quality iOS voices) */
+      var premium = [];
+      for (var p = 0; p < english.length; p++) if (/Premium|Enhanced/i.test(english[p].name)) premium.push(english[p]);
+      if (premium.length) {
+        for (var pu = 0; pu < premium.length; pu++) if (isEnUS(premium[pu])) return premium[pu];
+        for (var pg = 0; pg < premium.length; pg++) if (isEnGB(premium[pg])) return premium[pg];
+        return premium[0];
+      }
+      /* 2 — Known natural voices by name, preferring en-US, then en-GB, then any English */
+      var langChecks = [isEnUS, isEnGB, function () { return true; }];
+      for (var li = 0; li < langChecks.length; li++) {
+        for (var ni = 0; ni < NATURAL_VOICE_NAMES.length; ni++) {
+          for (var vi = 0; vi < english.length; vi++) {
+            if (langChecks[li](english[vi]) && voiceNameMatches(english[vi], NATURAL_VOICE_NAMES[ni])) return english[vi];
+          }
+        }
+      }
+      /* 3 — Any other en-US voice, then any English voice */
+      for (var ui = 0; ui < english.length; ui++) if (isEnUS(english[ui])) return english[ui];
+      return english[0];
+    }
+    function resolveCoachVoice() {
+      var voices = refreshCoachVoices();
+      var stored = (typeof store.coachVoice === "string") ? store.coachVoice : "";
+      if (stored) {
+        for (var i = 0; i < voices.length; i++) {
+          if (isEnglishVoice(voices[i]) && (voices[i].name === stored || voices[i].voiceURI === stored)) return voices[i];
+        }
+        /* stored voice no longer available on this device — fall back to Auto silently */
+      }
+      return pickAutoVoice(voices);
+    }
+    function populateCoachVoicePicker() {
+      var sel = $("coachVoiceSelect");
+      if (!sel) return;
+      var voices = refreshCoachVoices();
+      var stored = (typeof store.coachVoice === "string") ? store.coachVoice : "";
+      var seen = {}, english = [];
+      for (var i = 0; i < voices.length; i++) {
+        if (!isEnglishVoice(voices[i])) continue;
+        if (seen[voices[i].name]) continue;
+        seen[voices[i].name] = true;
+        english.push(voices[i]);
+      }
+      sel.innerHTML = "";
+      var autoOpt = document.createElement("option");
+      autoOpt.value = ""; autoOpt.textContent = "Auto (most natural)";
+      sel.appendChild(autoOpt);
+      var storedFound = false;
+      english.forEach(function (v) {
+        var opt = document.createElement("option");
+        opt.value = v.name; opt.textContent = v.name;
+        sel.appendChild(opt);
+        if (v.name === stored) storedFound = true;
+      });
+      sel.value = storedFound ? stored : "";
+    }
+    function splitSentences(text) {
+      var parts = String(text || "").match(/[^.!?]+[.!?]+["'”’)]*\s*|[^.!?]+$/g) || [];
+      var out = [];
+      for (var i = 0; i < parts.length; i++) { var s = parts[i].trim(); if (s) out.push(s); }
+      return out.length ? out : (String(text || "").trim() ? [String(text || "").trim()] : []);
+    }
+    function makeCoachUtterances(text) {
+      var voice = resolveCoachVoice();
+      return splitSentences(text).map(function (sentence) {
+        var u = new SpeechSynthesisUtterance(sentence);
+        u.rate = 0.95; u.pitch = 1.0;
+        if (voice) { u.voice = voice; try { u.lang = voice.lang; } catch (e) {} }
+        return u;
+      });
+    }
     function speak(text) {
       if (!store.coach || !("speechSynthesis" in window)) return Promise.resolve();
       speakChain = speakChain.then(function () {
         return new Promise(function (resolve) {
           var wasPlaying = !audio.paused && cur.dayId !== null;
           if (wasPlaying) audio.pause();
+          var finished = false;
           var done = function () {
+            if (finished) return; finished = true;
             if (resumeTimer) { clearTimeout(resumeTimer); resumeTimer = null; }
             if (wasPlaying && anySessionRunning()) tryPlay();
             resolve();
           };
-          var u = new SpeechSynthesisUtterance(text);
-          u.rate = 1.03; u.pitch = 1;
-          try {
-            var vs = window.speechSynthesis.getVoices();
-            for (var i = 0; i < vs.length; i++) { if (/en[-_]GB/i.test(vs[i].lang) && /male|daniel|george|arthur/i.test(vs[i].name)) { u.voice = vs[i]; break; } }
-            if (!u.voice) for (var j = 0; j < vs.length; j++) { if (/^en/i.test(vs[j].lang)) { u.voice = vs[j]; break; } }
-          } catch (e) {}
-          u.onend = done; u.onerror = done;
-          window.speechSynthesis.speak(u);
+          var utterances = makeCoachUtterances(text);
+          if (!utterances.length) { done(); return; }
+          var remaining = utterances.length;
+          utterances.forEach(function (u) {
+            u.onend = function () { remaining--; if (remaining <= 0) done(); };
+            u.onerror = function () { remaining--; if (remaining <= 0) done(); };
+            window.speechSynthesis.speak(u);
+          });
           resumeTimer = setTimeout(done, Math.min(30000, 2500 + text.length * 95)); // safety net
         });
       });
       return speakChain;
     }
-    if ("speechSynthesis" in window) { try { window.speechSynthesis.getVoices(); } catch (e) {} }
+    function speakTestVoice() {
+      if (!("speechSynthesis" in window)) return;
+      var text = "Coach voice on. I will cue your sets and check in on the walk — the podcast does the rest.";
+      makeCoachUtterances(text).forEach(function (u) { window.speechSynthesis.speak(u); });
+    }
+    if ("speechSynthesis" in window) {
+      refreshCoachVoices();
+      populateCoachVoicePicker();
+      var onVoicesChanged = function () { refreshCoachVoices(); populateCoachVoicePicker(); };
+      try {
+        if (window.speechSynthesis.addEventListener) window.speechSynthesis.addEventListener("voiceschanged", onVoicesChanged);
+        else window.speechSynthesis.onvoiceschanged = onVoicesChanged;
+      } catch (e) {}
+    }
 
     /* =============== PODCAST QUEUE ENGINE =============== */
     function anySessionRunning() {
@@ -6490,6 +6616,15 @@
       if (!store.coach && "speechSynthesis" in window) { try { window.speechSynthesis.cancel(); } catch (e) {} }
       if (store.coach) speak("Coach voice on. I will cue your sets and check in on the walk — the podcast does the rest.");
     });
+    var coachVoiceSel = $("coachVoiceSelect");
+    if (coachVoiceSel) {
+      populateCoachVoicePicker();
+      coachVoiceSel.addEventListener("change", function () {
+        store.coachVoice = this.value || ""; save();
+      });
+    }
+    var coachVoiceTestBtn = $("coachVoiceTest");
+    if (coachVoiceTestBtn) coachVoiceTestBtn.addEventListener("click", function () { speakTestVoice(); });
     $("timerSoundToggle").addEventListener("click", function () {
       store.timerSounds = !store.timerSounds; save();
       this.setAttribute("aria-pressed", store.timerSounds ? "true" : "false");
@@ -6521,6 +6656,7 @@
       t.textContent = store.coach ? "Coach: On" : "Coach: Off";
       var ts = $("timerSoundToggle");
       if (ts) { ts.setAttribute("aria-pressed", store.timerSounds ? "true" : "false"); ts.textContent = store.timerSounds ? "Timer sounds: On" : "Timer sounds: Off"; }
+      populateCoachVoicePicker();
       // restore today's sessions' displays + preload today's lesson queue position (no autoplay)
       repaintAll();
       var tView = todayView(), tId = tView.lDay ? tView.lDay.id : null, tst = tId ? store.days[tId] : null;
